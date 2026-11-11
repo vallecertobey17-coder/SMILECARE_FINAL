@@ -2,7 +2,10 @@
 
 Health services management web app for the Taytay Municipal Health Office, built from the SMILECare Figma design.
 
-**Live app:** https://claude.ai/artifact/QvfkyC7hzBhYGbb8r8FqQB
+**Live site (public):** https://vallecertobey17-coder.github.io/SMILECARE_FINAL/  
+**Hosted app with shared database (claude.ai, share from its Share menu):** https://claude.ai/artifact/QvfkyC7hzBhYGbb8r8FqQB
+
+The public site is deployed from the `gh-pages` branch (a copy of `dist/index.html`). To update it, run `npm run build` and replace `index.html` on that branch.
 
 ## Features
 
