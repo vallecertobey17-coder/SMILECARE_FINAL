@@ -39,14 +39,11 @@ export const fmtTime = (hm: string) => {
   return m ? `${hh}:${String(m).padStart(2, '0')} ${ap}` : `${hh} ${ap}`
 }
 export const fmtSchedule = (s: Service) => `${fmtDate(s.date)} ${fmtTime(s.start)} – ${fmtTime(s.end)}`
-export const initials = (name: string) =>
-  name
-    .replace(/^(Dr\.|Dra\.)\s*/i, '')
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((p) => p[0]!.toUpperCase())
-    .join('')
+export const initials = (name: string) => {
+  const parts = name.replace(/^(Dr\.|Dra\.)\s*/i, '').replace(/,.*$/, '').split(/\s+/).filter((p) => p && !/^[A-Z]\.$/.test(p))
+  const pick = parts.length > 1 ? [parts[0], parts[parts.length - 1]] : parts
+  return pick.map((p) => p[0]!.toUpperCase()).join('')
+}
 
 export function greeting(d = new Date()) {
   const h = d.getHours()

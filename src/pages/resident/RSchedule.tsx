@@ -1,0 +1,179 @@
+import { useMemo, useState } from 'react'
+import { BellRing, BellOff, MapPin } from 'lucide-react'
+import { useStore } from '../../lib/store'
+import { useResident } from './context'
+import { Icon } from '../../components/Icon'
+import { Empty, useToast } from '../../components/ui'
+import { BARANGAYS, fmtTime, isoDate, medicineStatus } from '../../lib/utils'
+import type { Service } from '../../lib/types'
+
+const ALERT_KEY = 'smilecare:alerts'
+
+export default function RSchedule() {
+  const { data } = useStore()
+  const { resident, go } = useResident()
+  const toast = useToast()
+  const [q, setQ] = useState('')
+  const [open, setOpen] = useState<string | null>(null)
+  const [alerts, setAlerts] = useState<string[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem(ALERT_KEY) || 'null') ?? [resident.barangay]
+    } catch {
+      return [resident.barangay]
+    }
+  })
+  const toggleAlert = (b: string) => {
+    const next = alerts.includes(b) ? alerts.filter((x) => x !== b) : [...alerts, b]
+    setAlerts(next)
+    try {
+      localStorage.setItem(ALERT_KEY, JSON.stringify(next))
+    } catch {
+      /* ignore */
+    }
+    toast(next.includes(b) ? `You'll be alerted about visits in Brgy. ${b}` : `Alerts off for Brgy. ${b}`)
+  }
+
+  const today = isoDate()
+  /** Deployments = upcoming services grouped by date + location. */
+  const deployments = useMemo(() => {
+    const groups = new Map<string, Service[]>()
+    for (const s of data.services.filter((x) => x.date >= today && x.status !== 'COMPLETED' && x.status !== 'CANCELLED')) {
+      const k = `${s.date}|${s.location}`
+      groups.set(k, [...(groups.get(k) ?? []), s])
+    }
+    const s = q.trim().toLowerCase()
+    return [...groups.values()]
+      .map((list) => ({ key: `${list[0].date}|${list[0].location}`, date: list[0].date, location: list[0].location, barangay: list[0].barangay ?? '', unitId: list.find((x) => x.unitId)?.unitId, services: list }))
+      .filter((d) => !s || `${d.location} ${d.barangay}`.toLowerCase().includes(s))
+      .sort((a, b) => a.date.localeCompare(b.date))
+  }, [data.services, today, q])
+
+  /** Medicines available for a deployment: its unit's loaded stock, or central stock for the health office. */
+  const availability = (unitId?: string) => {
+    const unit = data.units.find((u) => u.id === unitId)
+    const list = data.medicines.filter((m) => medicineStatus(m) !== 'EXPIRED')
+    return list
+      .map((m) => {
+        const qty = unit?.stock ? unit.stock[m.id] ?? 0 : m.stock
+        return { m, qty, state: qty <= 0 ? 'Out of stock' : qty < 30 ? 'Limited' : 'Available' }
+      })
+      .filter((x) => (unit?.stock ? x.m.id in unit.stock : true))
+      .sort((a, b) => b.qty - a.qty)
+  }
+
+  const nextFor = (b: string) => data.services.filter((s) => s.barangay === b && s.date >= today && s.status !== 'CANCELLED' && s.status !== 'COMPLETED').sort((a, x) => a.date.localeCompare(x.date))[0]
+
+  return (
+    <div className="page rpage">
+      <div className="page-head">
+        <div>
+          <h1 className="rtitle">Schedule &amp; availability</h1>
+          <p>Find the Rolling Botika and municipal health services near you.</p>
+        </div>
+      </div>
+
+      <div className="toolbar">
+        <div className="search">
+          <Icon name="search" className="ic-blue" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search barangay or location" aria-label="Search barangay or location" />
+        </div>
+      </div>
+
+      <section className="card">
+        <div className="card-head">
+          <div>
+            <h3>Barangay coverage</h3>
+            <p className="muted small">Turn on alerts for the barangays you want to hear about.</p>
+          </div>
+          <span className="muted small">{BARANGAYS.length} barangays • Taytay, Rizal</span>
+        </div>
+        <div className="brgy-grid">
+          {BARANGAYS.map((b) => {
+            const n = nextFor(b)
+            const on = alerts.includes(b)
+            return (
+              <div key={b} className={`brgy ${b === resident.barangay ? 'mine' : ''}`}>
+                <div className="brgy-top">
+                  <MapPin size={18} />
+                  <b>{b}</b>
+                  <button className={`icon-btn sm ${on ? 'ok' : ''}`} onClick={() => toggleAlert(b)} aria-label={on ? `Turn off alerts for ${b}` : `Turn on alerts for ${b}`} aria-pressed={on}>
+                    {on ? <BellRing size={16} /> : <BellOff size={16} />}
+                  </button>
+                </div>
+                <small className="muted">{n ? `Next visit ${new Date(n.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : 'No visit scheduled yet'}</small>
+                {b === resident.barangay && <span className="tag">YOUR BARANGAY</span>}
+              </div>
+            )
+          })}
+        </div>
+      </section>
+
+      <h3 className="sec-title">Upcoming schedules</h3>
+      {deployments.length === 0 && (
+        <section className="card">
+          <Empty text={q ? 'No schedules match your search.' : 'No upcoming schedules yet. Check the announcements for updates.'} />
+        </section>
+      )}
+      <div className="deploy-list">
+        {deployments.map((d) => {
+          const dt = new Date(d.date + 'T00:00:00')
+          const isOpen = open === d.key
+          const meds = availability(d.unitId)
+          const start = d.services.map((s) => s.start).sort()[0]
+          const end = d.services.map((s) => s.end).sort().slice(-1)[0]
+          return (
+            <section key={d.key} className={`deploy card ${d.barangay === resident.barangay ? 'mine' : ''}`}>
+              <div className="deploy-head">
+                <span className="date-tile sm">
+                  <b>{dt.getDate()}</b>
+                  <small>{dt.toLocaleDateString('en-US', { month: 'short' }).toUpperCase()}</small>
+                </span>
+                <div className="grow">
+                  <b className="deploy-title">{d.unitId ? 'Rolling Botika' : 'Health service'} • Brgy. {d.barangay || d.location}</b>
+                  <small className="muted">
+                    {dt.toLocaleDateString('en-US', { weekday: 'long' })} • {fmtTime(start)} - {fmtTime(end)} • {d.location}
+                  </small>
+                </div>
+                {d.date === today && <span className="pill pill-ok">TODAY</span>}
+              </div>
+              <div className="svc-chips">
+                {d.services.map((s) => {
+                  const left = Math.max(0, s.capacity - s.booked)
+                  return (
+                    <span key={s.id} className={`svc-chip ${left === 0 ? 'full' : ''}`}>
+                      {s.name} <small>{left === 0 ? 'Fully booked' : `${left} slots left`}</small>
+                    </span>
+                  )
+                })}
+              </div>
+              <div className="btn-row">
+                <button className="btn btn-outline sm" onClick={() => setOpen(isOpen ? null : d.key)} aria-expanded={isOpen}>
+                  {isOpen ? 'Hide medicines' : 'Check medicine availability'}
+                </button>
+                <button className="btn btn-primary sm" onClick={() => go('my-booking')}>
+                  Pre-book a slot
+                </button>
+              </div>
+              {isOpen && (
+                <div className="avail">
+                  {meds.length === 0 && <p className="muted small">No medicines have been loaded for this deployment yet.</p>}
+                  {meds.map(({ m, qty, state }) => (
+                    <div key={m.id} className="avail-row">
+                      <span className="grow">
+                        <b>
+                          {m.name} {m.strength}
+                        </b>
+                        <small className="muted">{m.purpose}</small>
+                      </span>
+                      <span className={`pill ${state === 'Available' ? 'pill-ok' : state === 'Limited' ? 'pill-wait' : 'pill-no'}`}>{state === 'Available' ? `${qty} available` : state}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          )
+        })}
+      </div>
+    </div>
+  )
+}

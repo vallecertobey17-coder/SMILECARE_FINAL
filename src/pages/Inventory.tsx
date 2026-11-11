@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react'
 import { Icon } from '../components/Icon'
 import { useStore } from '../lib/store'
 import type { Medicine, MedicineStatus } from '../lib/types'
+import { UnitStock } from '../components/UnitStock'
 import { Badge, RowMenu, Confirm, Empty, Field, Modal, PageHead, Pager, StatCard, Toolbar, usePaged, useToast } from '../components/ui'
 import { fmtMonth, fmtNum, medicineStatus } from '../lib/utils'
 
@@ -24,6 +25,7 @@ export default function Inventory() {
   const [restockOpen, setRestockOpen] = useState(false)
   const [deleting, setDeleting] = useState<Medicine | null>(null)
   const [err, setErr] = useState('')
+  const [view, setView] = useState<'central' | 'units'>('central')
 
   const withStatus = useMemo(() => data.medicines.map((m) => ({ m, st: medicineStatus(m) })), [data.medicines])
   const totalUnits = data.medicines.reduce((a, m) => a + (m.stock || 0), 0)
@@ -90,6 +92,12 @@ export default function Inventory() {
         <StatCard icon={<Icon name="stat-x" />} tone="orange" label="Expiring Soon" value={exp} note={`Within 30 days${withStatus.some((x) => x.st === 'EXPIRED') ? ` • ${withStatus.filter((x) => x.st === 'EXPIRED').length} expired` : ''}`} onClick={() => setStatus('EXPIRING SOON')} active={status === 'EXPIRING SOON'} />
       </div>
 
+      <div className="tabs" role="tablist">
+        <button role="tab" aria-selected={view === 'central'} className={view === 'central' ? 'on' : ''} onClick={() => setView('central')}>Central health office</button>
+        <button role="tab" aria-selected={view === 'units'} className={view === 'units' ? 'on' : ''} onClick={() => setView('units')}>Rolling Botika units</button>
+      </div>
+
+      {view === 'units' ? <UnitStock /> : (<>
       <Toolbar
           search={q} onSearch={setQ} placeholder="Search Inventory..." status={status} onStatus={setStatus} statuses={STATUSES}
           filtersOpen={showFilters} onToggleFilters={() => setShowFilters((v) => !v)} filterCount={form ? 1 : 0}
@@ -154,6 +162,7 @@ export default function Inventory() {
         </div>
         <Pager {...paged} onPage={paged.setPage} />
         </section>
+      </>)}
 
       <Modal open={!!editing} title={editing?.id ? 'Edit medicine' : 'New medicine'} onClose={() => setEditing(null)}
         footer={<><button className="btn btn-ghost" onClick={() => setEditing(null)}>Cancel</button><button className="btn btn-primary" onClick={save}>{editing?.id ? 'Save changes' : 'Add medicine'}</button></>}>
@@ -169,6 +178,8 @@ export default function Inventory() {
             <Field label="Reorder level" hint="Flagged as low stock at or below this amount"><input type="number" min={0} value={editing.draft.reorderLevel} onChange={(e) => set('reorderLevel', Number(e.target.value))} /></Field>
             <Field label="Expiry month"><input type="month" value={editing.draft.expiry} onChange={(e) => set('expiry', e.target.value)} /></Field>
             <Field label="Storage location"><input value={editing.draft.location || ''} onChange={(e) => set('location', e.target.value)} placeholder="Dispensary A" /></Field>
+            <div className="span-2"><Field label="Recorded purpose" hint="Shown to residents and used by Ask SMILE"><input value={editing.draft.purpose || ''} onChange={(e) => set('purpose', e.target.value)} placeholder="e.g. For high blood pressure" /></Field></div>
+            <div className="span-2"><Field label="Basic usage guidance"><input value={editing.draft.usage || ''} onChange={(e) => set('usage', e.target.value)} placeholder="e.g. Usually taken once a day. Take only as prescribed." /></Field></div>
             {err && <div className="alert alert-err span-2">{err}</div>}
           </div>
         )}

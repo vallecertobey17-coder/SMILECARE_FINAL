@@ -19,6 +19,23 @@ import statBell from '../assets/icons/stat-bell.svg'
 import statX from '../assets/icons/stat-x.svg'
 import pill from '../assets/icons/pill-mask.png'
 import bellImg from '../assets/icons/bell.svg'
+import r_appointment from '../assets/icons/r-appointment.svg'
+import r_history from '../assets/icons/r-history.svg'
+import r_ask from '../assets/icons/r-ask.svg'
+import r_epila from '../assets/icons/r-epila.svg'
+import r_schedule from '../assets/icons/r-schedule.svg'
+import r_profile from '../assets/icons/r-profile.svg'
+import r_announce from '../assets/icons/r-announce.svg'
+import r_truck from '../assets/icons/r-truck.svg'
+import r_clock from '../assets/icons/r-clock.svg'
+import r_pin from '../assets/icons/r-pin.svg'
+import r_book from '../assets/icons/r-book.svg'
+import r_chat from '../assets/icons/r-chat.svg'
+import r_qr from '../assets/icons/r-qr.svg'
+import r_chev from '../assets/icons/r-chev.svg'
+import r_arrow from '../assets/icons/r-arrow.svg'
+import r_med from '../assets/icons/r-med.png'
+import r_heart from '../assets/icons/r-heart.png'
 
 const ICONS = {
   dashboard: [dashboard, 29.055, 24.931],
@@ -39,6 +56,23 @@ const ICONS = {
   'stat-bell': [statBell, 28.0002, 28],
   'stat-x': [statX, 22, 21],
   pill: [pill, 31, 40],
+  'r-appointment': [r_appointment, 25.125, 13.756],
+  'r-history': [r_history, 26.989, 27],
+  'r-ask': [r_ask, 24.5, 24.362],
+  'r-epila': [r_epila, 25.779, 13.756],
+  'r-schedule': [r_schedule, 25.75, 27],
+  'r-profile': [r_profile, 19.5, 22],
+  'r-announce': [r_announce, 25.7501, 26.9956],
+  'r-truck': [r_truck, 39.0175, 27.9062],
+  'r-clock': [r_clock, 16.924, 16.5],
+  'r-pin': [r_pin, 24.6783, 24],
+  'r-book': [r_book, 21.537, 24],
+  'r-chat': [r_chat, 19.4805, 18],
+  'r-qr': [r_qr, 28.7914, 28],
+  'r-chev': [r_chev, 7.66959, 13.5],
+  'r-arrow': [r_arrow, 24.6783, 24],
+  'r-med': [r_med, 23, 35],
+  'r-heart': [r_heart, 24, 42],
 } as const
 
 export type IconName = keyof typeof ICONS

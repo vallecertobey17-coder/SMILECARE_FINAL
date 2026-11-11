@@ -11,7 +11,7 @@ type Draft = Omit<Unit, 'id'>
 const blank = (): Draft => ({ name: '', location: '', until: '17:00', served: 0, queue: 0, status: 'OPEN', kind: 'Rolling Botika', description: '' })
 
 export default function Botika() {
-  const { data, add, update, remove, readOnly } = useStore()
+  const { data, add, update, remove, readOnly, log } = useStore()
   const toast = useToast()
   const [editing, setEditing] = useState<{ id?: string; draft: Draft } | null>(null)
   const [deleting, setDeleting] = useState<Unit | null>(null)
@@ -20,6 +20,25 @@ export default function Botika() {
 
   const active = data.units.filter((u) => u.status !== 'CLOSED')
   const units = [...data.units].sort((a, b) => (a.status === 'CLOSED' ? 1 : 0) - (b.status === 'CLOSED' ? 1 : 0) || a.name.localeCompare(b.name))
+
+  /** Serve the next number: close the current E-Pila ticket and call the next one. */
+  async function callNext(u: Unit) {
+    if (busy) return
+    setBusy(u.id)
+    const next = u.served + 1
+    try {
+      await update('units', u.id, { queue: Math.max(0, u.queue - 1), served: next }, { silent: true })
+      for (const t of data.tickets.filter((x) => x.unitId === u.id && x.status === 'SERVING')) await update('tickets', t.id, { status: 'DONE' }, { silent: true })
+      const t = data.tickets.filter((x) => x.unitId === u.id && x.status === 'WAITING' && x.number <= next).sort((a, b) => a.number - b.number)[0]
+      if (t) await update('tickets', t.id, { status: 'SERVING' }, { silent: true })
+      log('call-next', 'units', `${u.name} now serving #${next}${t ? ` (${t.residentName})` : ''}`)
+      toast(`Now serving #${next}${t ? ` • ${t.residentName}` : ''}`)
+    } catch (e: any) {
+      toast(e.message, 'err')
+    } finally {
+      setBusy(null)
+    }
+  }
 
   async function act(u: Unit, patch: Partial<Unit>, msg: string) {
     if (busy) return
@@ -84,10 +103,18 @@ export default function Botika() {
               <div><b>{u.queue}</b><small>In queue</small></div>
               <div><b>{u.served + u.queue ? Math.round((u.served / (u.served + u.queue)) * 100) : 0}%</b><small>Done</small></div>
             </div>
+            {data.tickets.some((t) => t.unitId === u.id && (t.status === 'WAITING' || t.status === 'SERVING')) && (
+              <div className="tickets-mini">
+                <span className="muted small">E-Pila tickets</span>
+                {data.tickets.filter((t) => t.unitId === u.id && (t.status === 'WAITING' || t.status === 'SERVING')).sort((a, b) => a.number - b.number).slice(0, 6).map((t) => (
+                  <span key={t.id} className={`tk ${t.status === 'SERVING' ? 'on' : ''}`} title={`${t.residentName} • ${t.purpose}`}>#{t.number} {t.residentName.split(' ')[0]}</span>
+                ))}
+              </div>
+            )}
             {!readOnly && (
               <div className="unit-actions">
                 <button className="btn btn-outline" disabled={u.status === 'CLOSED' || busy === u.id} onClick={() => act(u, { queue: u.queue + 1 }, `Added to queue • ${u.name}`)}><UserPlus size={17} /> Add to queue</button>
-                <button className="btn btn-primary" disabled={u.queue <= 0 || u.status === 'CLOSED' || busy === u.id} onClick={() => act(u, { queue: u.queue - 1, served: u.served + 1 }, `Now serving #${u.served + 1} at ${u.name}`)}><BellRing size={17} /> Call next</button>
+                <button className="btn btn-primary" disabled={u.queue <= 0 || u.status === 'CLOSED' || busy === u.id} onClick={() => callNext(u)}><BellRing size={17} /> Call next</button>
                 <select className="mini-select" value={u.status} aria-label={`Status for ${u.name}`} onChange={(e) => act(u, { status: e.target.value as UnitStatus }, `${u.name} is now ${e.target.value.toLowerCase()}`)}>
                   {STATUSES.map((s) => <option key={s} value={s}>{s.charAt(0) + s.slice(1).toLowerCase()}</option>)}
                 </select>

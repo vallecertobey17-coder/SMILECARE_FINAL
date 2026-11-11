@@ -5,6 +5,7 @@ import type { Transaction } from '../lib/types'
 import { Empty, Field, Modal, PageHead, Pager, StatCard, usePaged, useToast } from '../components/ui'
 import { BARANGAYS, fmtDate, fmtMonth, fmtNum, fmtPeso, isoDate, saveFile, toCSV } from '../lib/utils'
 import { COLLECTIONS } from '../lib/types'
+import { HealthMap, DeploymentPlanner, AuditLog } from './AnalyticsTabs'
 
 const PALETTE = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)', 'var(--c5)', 'var(--c6)']
 const prevMonth = (ym: string) => {
@@ -53,6 +54,7 @@ function Donut({ parts }: { parts: { label: string; value: number }[] }) {
 }
 
 export default function Analytics() {
+  const [tab, setTab] = useState<'overview' | 'map' | 'plan' | 'audit'>('overview')
   const store = useStore()
   const { data, add, readOnly } = store
   const toast = useToast()
@@ -154,8 +156,18 @@ export default function Analytics() {
   return (
     <div className="page">
       <PageHead title="Analytics & Reports" subtitle="Health service needs, service utilization, important data. All in one place."
-        actions={<button className="btn btn-primary" onClick={generateReport}><FileText size={18} /> Generate report</button>} />
+        actions={tab === 'overview' && <button className="btn btn-primary" onClick={generateReport}><FileText size={18} /> Generate report</button>} />
 
+      <div className="tabs" role="tablist">
+        {([['overview', 'Overview'], ['map', 'Health mapping'], ['plan', 'Deployment planner'], ['audit', 'System audit trail']] as const).map(([id, label]) => (
+          <button key={id} role="tab" aria-selected={tab === id} className={tab === id ? 'on' : ''} onClick={() => setTab(id)}>{label}</button>
+        ))}
+      </div>
+
+      {tab === 'map' && <HealthMap />}
+      {tab === 'plan' && <DeploymentPlanner onSchedule={(b) => { toast(`Add the Brgy. ${b} visit in Health Services`); window.location.hash = 'services' }} />}
+      {tab === 'audit' && <AuditLog />}
+      {tab === 'overview' && (<>
       <div className="filters filters-inline">
         <div className="select-wrap">
           <select value={m} onChange={(e) => setMonth(e.target.value)} aria-label="Month">{months.map((x) => <option key={x} value={x}>{fmtMonth(x)}</option>)}</select>
@@ -218,8 +230,9 @@ export default function Analytics() {
           </div>
         </section>
       </div>
+      </>)}
 
-      <Modal open={txOpen} title="Record transaction" subtitle="Adds an entry to the audit trail" onClose={() => setTxOpen(false)}
+      <Modal open={txOpen} title="Record transaction" subtitle="Adds an entry to the transaction history" onClose={() => setTxOpen(false)}
         footer={<><button className="btn btn-ghost" onClick={() => setTxOpen(false)}>Cancel</button><button className="btn btn-primary" onClick={recordTx}>Record</button></>}>
         <div className="form-grid">
           <Field label="Service">

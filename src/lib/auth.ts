@@ -1,21 +1,29 @@
-// Staff sign-in for this device. Accounts are kept in this browser only
-// (password stored as a salted SHA-256 hash). Access to the shared data itself
-// is controlled by who the SMILECare page is shared with on claude.ai.
+// Sign-in for staff and residents. Credentials are kept in this browser only
+// (password stored as a salted SHA-256 hash). Staff roles come from the shared
+// staff roster (role-based access control); residents are linked to their
+// resident record.
+import type { StaffRole } from './types'
+
+export type AccountKind = 'staff' | 'resident'
 export interface Account {
+  kind: AccountKind
   name: string
   email: string
-  role: string
   salt: string
   hash: string
+  residentId?: string
 }
 export interface Session {
+  kind: AccountKind
   name: string
   email: string
-  role: string
+  role: StaffRole | 'Resident'
+  title?: string
+  residentId?: string
 }
 
-const ACC = 'smilecare:accounts'
-const SES = 'smilecare:session'
+const ACC = 'smilecare:accounts:v2'
+const SES = 'smilecare:session:v2'
 
 function read<T>(store: Storage | undefined, key: string): T | null {
   try {
@@ -43,42 +51,67 @@ async function hash(password: string, salt: string) {
     .join('')
 }
 
+export const normEmail = (e: string) => e.trim().toLowerCase()
 export const accounts = () => read<Account[]>(ls(), ACC) ?? []
+export const findAccount = (email: string) => accounts().find((a) => a.email === normEmail(email))
 
-export async function register(name: string, email: string, role: string, password: string) {
+export async function createAccount(a: { kind: AccountKind; name: string; email: string; password: string; residentId?: string }) {
   const list = accounts()
-  const e = email.trim().toLowerCase()
-  if (list.some((a) => a.email === e)) throw new Error('An account with this email already exists on this device.')
+  const e = normEmail(a.email)
+  if (list.some((x) => x.email === e)) throw new Error('An account with this email already exists on this device. Please sign in.')
   const salt = Math.random().toString(36).slice(2)
-  const acc: Account = { name: name.trim(), email: e, role: role.trim() || 'Health Worker', salt, hash: await hash(password, salt) }
+  const acc: Account = { kind: a.kind, name: a.name.trim(), email: e, salt, hash: await hash(a.password, salt), residentId: a.residentId }
   write(ls(), ACC, [...list, acc])
   return acc
 }
 
-export async function login(email: string, password: string, remember: boolean): Promise<Session> {
-  const e = email.trim().toLowerCase()
-  const acc = accounts().find((a) => a.email === e)
+export async function checkPassword(email: string, password: string): Promise<Account> {
+  const acc = findAccount(email)
   if (!acc || (await hash(password, acc.salt)) !== acc.hash) throw new Error('Incorrect email or password.')
-  const s: Session = { name: acc.name, email: acc.email, role: acc.role }
-  write(remember ? ls() : ss(), SES, s)
-  return s
+  return acc
 }
 
-export function updateProfile(email: string, patch: { name?: string; role?: string }) {
-  const list = accounts()
-  const acc = list.find((a) => a.email === email)
-  if (acc) {
-    Object.assign(acc, patch)
-    write(ls(), ACC, list)
-  }
+export function saveSession(s: Session, remember: boolean) {
+  write(remember ? ls() : ss(), SES, s)
+}
+export function updateSession(patch: Partial<Session>) {
   for (const st of [ls(), ss()]) {
     const s = read<Session>(st, SES)
-    if (s && s.email === email) write(st, SES, { ...s, ...patch })
+    if (s) write(st, SES, { ...s, ...patch })
+  }
+  const list = accounts()
+  const cur = currentSession()
+  const acc = cur && list.find((a) => a.email === cur.email)
+  if (acc && patch.name) {
+    acc.name = patch.name
+    write(ls(), ACC, list)
   }
 }
-
 export const currentSession = () => read<Session>(ss(), SES) ?? read<Session>(ls(), SES)
 export function logout() {
   write(ls(), SES, null)
   write(ss(), SES, null)
 }
+
+/* ---------- role-based access ---------- */
+export type Permission =
+  | 'dashboard'
+  | 'residents'
+  | 'inventory'
+  | 'services'
+  | 'dispensing'
+  | 'consultations'
+  | 'vaccinations'
+  | 'botika'
+  | 'announcements'
+  | 'analytics'
+  | 'staff'
+  | 'backup'
+
+export const ROLE_ACCESS: Record<StaffRole, Permission[]> = {
+  Administrator: ['dashboard', 'residents', 'inventory', 'services', 'dispensing', 'consultations', 'vaccinations', 'botika', 'announcements', 'analytics', 'staff', 'backup'],
+  'Health Personnel': ['dashboard', 'residents', 'services', 'dispensing', 'consultations', 'vaccinations', 'botika', 'announcements', 'analytics'],
+  Pharmacist: ['dashboard', 'residents', 'inventory', 'dispensing', 'botika', 'analytics'],
+  'Rolling Botika Staff': ['dashboard', 'residents', 'inventory', 'dispensing', 'consultations', 'botika'],
+}
+export const can = (s: Session | null, p: Permission) => !!s && s.kind === 'staff' && ROLE_ACCESS[s.role as StaffRole]?.includes(p)

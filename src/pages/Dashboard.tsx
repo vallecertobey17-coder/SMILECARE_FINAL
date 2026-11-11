@@ -1,10 +1,14 @@
 import { useMemo } from 'react'
 import { Users, CalendarCheck, ListOrdered, AlertTriangle, ChevronRight, Truck, Building2, Pill, UserCheck, Clock } from 'lucide-react'
 import { useStore } from '../lib/store'
+import { can, type Permission, type Session } from '../lib/auth'
 import { Badge, StatCard } from '../components/ui'
 import { daysToExpiry, fmtNum, fmtTime, greeting, isoDate, medicineStatus } from '../lib/utils'
 
-export default function Dashboard({ go, firstName }: { go: (r: string) => void; firstName: string }) {
+export default function Dashboard({ go: rawGo, session }: { go: (r: string) => void; session: Session }) {
+  const firstName = session.name.replace(/^(Dr\.|Dra\.)\s*/i, '').split(' ')[0]
+  const allowed = (r: string) => can(session, r as Permission)
+  const go = (r: string) => (allowed(r) ? rawGo(r) : undefined)
   const { data, loaded } = useStore()
   const now = new Date()
   const todayIso = isoDate(now)
@@ -43,6 +47,22 @@ export default function Dashboard({ go, firstName }: { go: (r: string) => void; 
             {greeting(now)}, {firstName}. Here's what's happening across SMILECare today.
           </p>
         </div>
+        <span className="badge badge-blue lg">{session.role}</span>
+      </div>
+
+      <div className="quick-row">
+        {[
+          { id: 'dispensing', label: 'Dispense medicine' },
+          { id: 'consultations', label: 'Record consultation' },
+          { id: 'vaccinations', label: 'Record vaccination' },
+          { id: 'residents', label: 'Register walk-in' },
+          { id: 'botika', label: 'Manage E-Pila' },
+          { id: 'announcements', label: 'Post announcement' },
+          { id: 'inventory', label: 'Load Rolling Botika' },
+          { id: 'analytics', label: 'Deployment planner' },
+        ].filter((a) => allowed(a.id)).slice(0, 5).map((a) => (
+          <button key={a.id} className="chip" onClick={() => go(a.id)}>{a.label}</button>
+        ))}
       </div>
 
       <div className="stats">

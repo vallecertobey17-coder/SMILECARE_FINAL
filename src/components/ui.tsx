@@ -179,6 +179,13 @@ const toneFor: Record<string, string> = {
   EXPIRED: 'red',
   ERROR: 'red',
   CLOSED: 'gray',
+  ACTIVE: 'green',
+  INACTIVE: 'gray',
+  CANCELLED: 'gray',
+  WAITING: 'amber',
+  SERVING: 'blue',
+  DONE: 'green',
+  CONFIRMED: 'green',
 }
 export function Badge({ status }: { status: string }) {
   return <span className={`badge badge-${toneFor[status] ?? 'gray'}`}>{status}</span>
@@ -241,6 +248,7 @@ export function Toolbar({
   onToggleFilters,
   filterCount,
   action,
+  allLabel = 'All Statuses',
 }: {
   search: string
   onSearch: (v: string) => void
@@ -252,6 +260,7 @@ export function Toolbar({
   onToggleFilters?: () => void
   filterCount?: number
   action?: ReactNode
+  allLabel?: string
 }) {
   return (
     <div className="toolbar">
@@ -266,10 +275,10 @@ export function Toolbar({
       </div>
       <div className="select-wrap">
         <select value={status} onChange={(e) => onStatus(e.target.value)} aria-label="Status filter">
-          <option value="">All Statuses</option>
+          <option value="">{allLabel}</option>
           {statuses.map((s) => (
             <option key={s} value={s}>
-              {s.charAt(0) + s.slice(1).toLowerCase()}
+              {s === s.toUpperCase() ? s.charAt(0) + s.slice(1).toLowerCase() : s}
             </option>
           ))}
         </select>
@@ -316,7 +325,9 @@ export function Pager({ page, pages, total, onPage }: { page: number; pages: num
 
 export function usePaged<T>(rows: T[], size = 8, resetKey = '') {
   const [page, setPage] = useState(1)
-  useEffect(() => setPage(1), [resetKey])
+  useEffect(() => {
+    setPage(1)
+  }, [resetKey])
   const pages = Math.max(1, Math.ceil(rows.length / size))
   const p = Math.min(page, pages)
   return { page: p, pages, setPage, slice: rows.slice((p - 1) * size, p * size), total: rows.length }

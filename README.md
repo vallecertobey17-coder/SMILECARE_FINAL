@@ -1,67 +1,81 @@
 # SMILECare
 
-Health services management web app for the Taytay Municipal Health Office, built from the SMILECare Figma design.
+**SMILECare: An Integrated Health Information System with AI Integration for Inventory and Scheduling**
 
-**Live site (public):** https://vallecertobey17-coder.github.io/SMILECARE_FINAL/  
-**Hosted app with shared database (claude.ai, share from its Share menu):** https://claude.ai/artifact/QvfkyC7hzBhYGbb8r8FqQB
+A working prototype for System Analysis and Design, built from the SMILECare Figma design (Admin and User pages) and the project proposal. It supports the Municipality of Taytay's Rolling Botika mobile healthcare initiative with an **administrative platform** for municipal health personnel and a **resident platform**.
 
-The public site is deployed from the `gh-pages` branch (a copy of `dist/index.html`). To update it, run `npm run build` and replace `index.html` on that branch.
+**Project team:** Alanzalon, AJ F. (Project Leader) • Capili, Renji Gian M. • Compa, Alfredo Jr. P. • Peñalosa, Jorge D. • Vallecer, Tobey DS.
 
-## Features
+**Live demo:** https://vallecertobey17-coder.github.io/SMILECARE_FINAL/
 
-| Page | What it does |
-| --- | --- |
-| Home & Login | Public landing page, staff sign-in and account creation |
-| Dashboard | Live KPIs, today's operations, inventory alerts, service quotas |
-| Residents | Resident profiles, approve/reject verification, search & filters |
-| Medicine Inventory | Stock levels, low-stock / expiring / expired status, restock |
-| Health Services | Schedules, capacity, slot booking, status updates |
-| Medicine Dispensing | Release medicines to residents (deducts stock automatically, blocks expired or insufficient stock) |
-| Rolling Botika & E-Pila | Mobile units with live virtual queue ("Call next") |
-| Analytics & Reports | KPIs vs last month, top services chart, audit trail, CSV/JSON export |
-| Settings | Profile and data/sync status |
+## Demo accounts
 
-Responsive: a sidebar on desktop and a floating bottom tab bar on phones and tablets.
+On the sign-in page, tap a demo chip to sign in instantly (password `SmileCare2026`):
+
+| Chip | Email | What you'll see |
+| --- | --- | --- |
+| Resident | aj@smilecare.demo | Resident platform (AJ F. Alanzalon, verified) |
+| Administrator | admin@smilecare.demo | Everything, including Staff & Roles and Backup |
+| Health Personnel | doctor@smilecare.demo | Consultations, vaccinations, services, analytics |
+| Pharmacist | pharmacist@smilecare.demo | Inventory, dispensing, analytics |
+| Rolling Botika Staff | botika@smilecare.demo | Unit inventory, E-Pila, dispensing, consultations |
+
+You can also register a new resident (with ID upload) and verify them as the Administrator.
+
+Data is sample data saved in your browser. **Settings → Reset demo data** restores it.
+
+## Feature map (proposal → system)
+
+### Administrative platform
+| # | Proposal feature | Where |
+| --- | --- | --- |
+| 1 | User authentication & role-based access control | Sign-in (Health Personnel tab), Staff & Roles, menus filtered by role |
+| 2 | Real-time smart inventory management | Medicine Inventory → Central health office / Rolling Botika units, low-stock & expiry alerts |
+| 3 | Digital beneficiary profiling & QR ID system | Residents: QR Health ID, scan/find by ID, walk-in registration, histories |
+| 4 | Dispensing management with eligibility checking | Medicine Dispensing: eligibility panel, pharmacist verification, resident requests |
+| 5 | Consultation management | Consultations |
+| 6 | Vaccination management | Vaccinations |
+| 7 | Health & medicine analytics | Analytics & Reports → Overview |
+| 8 | Offline data synchronization | Works offline; changes queue on the device and sync when back online (header status) |
+| 9 | Health mapping reports | Analytics → Health mapping (barangay-level, CSV export) |
+| 10 | Smart deployment recommendation | Analytics → Deployment planner (+ medicine demand forecast, optional AI plan) |
+| 11 | Audit trail | Analytics → System audit trail (every create/update/delete/sign-in) |
+| 12 | Data backup and recovery | Settings → Backup & recovery (download, restore, automatic daily backups) |
+
+### Resident platform
+| # | Proposal feature | Where |
+| --- | --- | --- |
+| 1 | User authentication & resident verification | Sign-in (Resident tab) → register with ID upload → admin verifies |
+| 2 | Online announcements | Announcements (All / Unread / Appointments / Advisories) |
+| 3 | Service bulletin availability | Schedule → services per deployment |
+| 4 | Notification & schedule alerts | Bell notifications, barangay alerts in Schedule |
+| 5 | Medicine & service availability checker | Schedule → "Check medicine availability" |
+| 6 | Appointment pre-booking | Appointment & E-Pila → Book Appointment / Request Medicine |
+| 7 | Digital queue ticket (E-Pila) | Appointment & E-Pila → My E-Pila (staff "Call next" updates it live) |
+| 8 | Beneficiary profiling & history tracking | Profile & QR ID, Health History |
+| 9 | AI chatbot assistant | Ask SMILE (general information only; no diagnosis or prescription) |
+
+## Suggested presentation flow
+
+1. **Homepage** → programs, platforms, team.
+2. **Resident** chip → Home → Schedule (check availability) → Appointment & E-Pila (book + request medicine, get a queue number) → Ask SMILE → Profile & QR ID.
+3. **Administrator** chip → Residents (scan `SC-TAY-2024-018429`, verify Roberto Mendoza) → Dispensing (eligibility check, release) → Rolling Botika & E-Pila (Call next) → Analytics tabs → Settings (backup).
+4. **Pharmacist** chip → show the smaller, role-based menu.
 
 ## Tech stack
 
-- React 19 + TypeScript + Vite
-- Icons exported from the Figma file (`src/assets/icons`) plus `lucide-react`
-- Built as a single self-contained `index.html` (`vite-plugin-singlefile`)
-
-## Data
-
-- **Hosted on claude.ai:** records are stored in the artifact's shared database, so every staff member the page is shared with sees the same data live.
-- **Anywhere else (e.g. `npm run dev`):** the app runs in offline demo mode with sample data saved in the browser's localStorage. Settings → *Reset demo data* restores it.
-
-Staff sign-in accounts are stored per browser (passwords are salted SHA-256 hashes). This is a convenience lock, not server-side authentication. Real access control for the hosted app is who the page is shared with.
-
-## Getting started
+React 19 + TypeScript + Vite, built into a single `index.html`. Icons exported from the Figma file (`src/assets/icons`) plus `lucide-react`; QR codes via `qrcode`.
 
 ```bash
 npm install
 npm run dev      # local development server
 npm run build    # outputs dist/index.html
-npm run preview  # serve the production build
 ```
 
-## Project structure
+The demo site is the `gh-pages` branch (a copy of `dist/index.html`).
 
-```
-src/
-  App.tsx              hash routing (#dashboard, #residents, ...) and auth gate
-  config.ts            IT support contact details (fill these in) and municipality name
-  index.css            design tokens and all styles
-  lib/
-    store.tsx          data layer: shared database, falling back to localStorage
-    auth.ts            per-browser staff accounts
-    seed.ts            sample records taken from the Figma screens
-    types.ts, utils.ts
-  components/          Layout (sidebar, header, bottom tab bar), Icon, shared UI
-  pages/               one file per screen
-```
+## Notes and limitations
 
-## To do
-
-- Fill in the real IT support email and phone in `src/config.ts`.
-- The resident-facing "User" pages from the Figma file are not built yet.
+- Accounts and data are stored in the browser for demonstration; this prototype is not meant for real patient data.
+- Ask SMILE gives general information from the medicine records. When hosted inside Claude it can use AI; on the public demo it uses built-in answers.
+- Figma screens that weren't available (for example some mobile layouts) were designed in the same style.
