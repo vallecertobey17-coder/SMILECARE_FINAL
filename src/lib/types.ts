@@ -104,6 +104,7 @@ export interface Unit {
   description?: string
   stock?: Record<string, number> // medicineId -> quantity loaded on this unit
   services?: string[] // programs offered at this deployment
+  coords?: [number, number] // deployment site (lat, lng)
 }
 
 export type AnnouncementCategory = 'URGENT' | 'ROLLING BOTIKA' | 'ADVISORY' | 'APPOINTMENT'
