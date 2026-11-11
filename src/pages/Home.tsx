@@ -6,9 +6,9 @@ import { MUNICIPALITY, PROJECT } from '../config'
 function Smile({ size = 66 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 66 66" aria-hidden="true">
-      <circle cx="33" cy="33" r="33" fill="#8e2346" />
-      <circle cx="24" cy="27" r="3.6" fill="#f3a98f" />
-      <circle cx="42" cy="27" r="3.6" fill="#f3a98f" />
+      <circle cx="33" cy="33" r="33" fill="#006398" />
+      <circle cx="24" cy="27" r="3.6" fill="#9fd6ff" />
+      <circle cx="42" cy="27" r="3.6" fill="#9fd6ff" />
       <path d="M19 37c3.5 8 24.5 8 28 0" stroke="#fff" strokeWidth="5" strokeLinecap="round" fill="none" />
     </svg>
   )
