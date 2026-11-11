@@ -1,29 +1,14 @@
 import { useState } from 'react'
 import { ChevronRight, CalendarCheck, ShieldCheck, Check, Truck, History, MessageSquareText, Pill, X, HelpCircle } from 'lucide-react'
 import { MUNICIPALITY, PROJECT } from '../config'
-
-/** Smiling logo mark used on the landing page. */
-function Smile({ size = 66 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 66 66" aria-hidden="true">
-      <circle cx="33" cy="33" r="33" fill="#006398" />
-      <circle cx="24" cy="27" r="3.6" fill="#9fd6ff" />
-      <circle cx="42" cy="27" r="3.6" fill="#9fd6ff" />
-      <path d="M19 37c3.5 8 24.5 8 28 0" stroke="#fff" strokeWidth="5" strokeLinecap="round" fill="none" />
-    </svg>
-  )
-}
+import logoBlue from '../assets/brand/logo-blue.png'
+import markBlue from '../assets/brand/mark-blue.png'
 
 function Brand({ small }: { small?: boolean }) {
   return (
     <div className={`lp-brand ${small ? 'sm' : ''}`}>
-      <Smile size={small ? 56 : 66} />
-      <span>
-        <b>
-          SMILE<em>Care</em>
-        </b>
-        <small>Taytay Health, Closer to You</small>
-      </span>
+      <img src={logoBlue} alt="SMILECare" />
+      <small>Taytay Health, Closer to You</small>
     </div>
   )
 }
@@ -83,7 +68,7 @@ export default function Home({ onLogin }: { onLogin: (kind: 'resident' | 'staff'
           <div className="lp-ring" />
           <div className="lp-phone">
             <div className="lp-phone-top">
-              <Smile size={34} />
+              <img src={markBlue} alt="" width={26} height={38} />
               <span>9:41</span>
             </div>
             <p className="lp-greet">Magandang umaga,</p>

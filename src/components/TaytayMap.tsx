@@ -138,7 +138,7 @@ export function TaytayMap({
     else if (sel) m.setView(sel, Math.max(m.getZoom(), 14), { animate: false })
     else if (me && nearestId) {
       const n = units.find((u) => u.id === nearestId)
-      if (n) m.fitBounds(L.latLngBounds([me, n.coords]), { padding: [70, 70], maxZoom: 16, animate: false })
+      if (n) m.fitBounds(L.latLngBounds([me, n.coords]), { paddingTopLeft: [70, 110], paddingBottomRight: [70, 50], maxZoom: 16, animate: false })
     } else if (pts.length > 1) m.fitBounds(L.latLngBounds(pts), { padding: [40, 40], maxZoom: 15, animate: false })
   }, [pins, units, me, nearestId, focusUnit, selected])
 

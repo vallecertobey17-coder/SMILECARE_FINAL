@@ -89,7 +89,7 @@ export default function RSchedule() {
   /** Pseudo location: a spot inside the chosen barangay (used for demos or when GPS isn't available). */
   const setPseudo = (b: string, why: string) => {
     const c = BARANGAY_COORDS[b] ?? TAYTAY_CENTER
-    setMe([c[0] + 0.0014, c[1] - 0.0017])
+    setMe([c[0] - 0.0026, c[1] + 0.0011]) // a spot just south of the barangay marker, clear of its label
     setMeNote(why)
     setFocusUnit(null)
     setLocating(false)

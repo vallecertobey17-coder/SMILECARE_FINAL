@@ -5,6 +5,8 @@ import { useStore } from '../lib/store'
 import { initials } from '../lib/utils'
 import { Modal } from './ui'
 import { PROJECT } from '../config'
+import logoBlue from '../assets/brand/logo-blue.png'
+import logoWhite from '../assets/brand/logo-white.png'
 
 export interface NavItem {
   id: string
@@ -24,18 +26,7 @@ export interface Notice {
 const renderIcon = (icon: NavItem['icon']) => (isValidElement(icon) ? icon : <Icon name={icon as IconName} />)
 
 export function Logo({ light }: { light?: boolean }) {
-  return (
-    <div className={`logo ${light ? 'logo-light' : ''}`}>
-      <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true">
-        <rect width="36" height="36" rx="10" fill="currentColor" opacity=".14" />
-        <path d="M18 9v18M9 18h18" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-        <path d="M11.5 22.5c3.6 3.4 9.4 3.4 13 0" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" fill="none" opacity=".7" />
-      </svg>
-      <span>
-        SMILE<b>Care</b>
-      </span>
-    </div>
-  )
+  return <img className={`logo-img ${light ? 'light' : ''}`} src={light ? logoWhite : logoBlue} alt="SMILECare" />
 }
 
 export function Layout({
