@@ -43,7 +43,7 @@ export default function StaffPage({ session }: { session: Session }) {
   return (
     <div className="page">
       <PageHead title="Staff & Roles" subtitle="Authorize municipal health personnel and Rolling Botika staff, and assign role-based access."
-        actions={!readOnly && <button className="btn btn-primary" onClick={() => { setErr(''); setEditing({ draft: { name: '', email: '', role: 'Health Personnel', title: '', active: true } }) }}><Icon name="add" /> Add staff</button>} />
+        actions={!readOnly && <button className="btn btn-primary" onClick={() => { setErr(''); setEditing({ draft: { name: '', email: '', role: 'Municipal Health Doctor', title: '', active: true } }) }}><Icon name="add" /> Add staff</button>} />
       <div className="stats stats-3">
         <StatCard icon={<Users size={24} />} label="Active staff" value={data.staff.filter((s) => s.active).length} note={`${data.staff.length} on roster`} />
         <StatCard icon={<ShieldCheck size={24} />} label="Administrators" value={admins.length} note="Full access" />

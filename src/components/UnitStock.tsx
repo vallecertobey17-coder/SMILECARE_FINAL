@@ -8,8 +8,9 @@ import { medLabel } from '../lib/domain'
 const LOW = 20
 
 /** Inventory actually loaded in each Rolling Botika unit, with load/return transfers to the central office. */
-export function UnitStock() {
-  const { data, update, readOnly, log } = useStore()
+export function UnitStock({ readOnly: ro }: { readOnly?: boolean }) {
+  const { data, update, readOnly: storeRO, log } = useStore()
+  const readOnly = storeRO || !!ro
   const toast = useToast()
   const units = data.units.filter((u) => u.kind === 'Rolling Botika')
   const [open, setOpen] = useState(false)

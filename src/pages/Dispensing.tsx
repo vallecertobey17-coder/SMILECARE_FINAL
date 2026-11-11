@@ -28,7 +28,7 @@ export default function Dispensing({ session }: { session: Session }) {
   const [err, setErr] = useState('')
   const [viewing, setViewing] = useState<Disp | null>(null)
   const [deleting, setDeleting] = useState<Disp | null>(null)
-  const verifier = session.role === 'Pharmacist' || session.role === 'Administrator' || session.role === 'Health Personnel' || session.role === 'Rolling Botika Staff'
+  const verifier = session.role === 'Pharmacist' || session.role === 'Administrator' || session.role === 'Municipal Health Doctor' || session.role === 'Rolling Botika Staff'
 
   const resident = useMemo(() => {
     const v = residentQ.trim().toLowerCase()

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { CalendarDays, Activity, CheckCircle2 } from 'lucide-react'
 import { Icon } from '../components/Icon'
 import { useStore } from '../lib/store'
+import { AppointmentsBoard } from '../components/AppointmentsBoard'
 import type { Service, ServiceStatus } from '../lib/types'
 import { Badge, RowMenu, Confirm, Empty, Field, Modal, PageHead, Pager, StatCard, Toolbar, usePaged, useToast } from '../components/ui'
 import { fmtDate, fmtTime, isoDate } from '../lib/utils'
@@ -22,6 +23,7 @@ export default function Services() {
   const [editing, setEditing] = useState<{ id?: string; draft: Draft } | null>(null)
   const [deleting, setDeleting] = useState<Service | null>(null)
   const [err, setErr] = useState('')
+  const [tab, setTab] = useState<'schedule' | 'appointments'>('schedule')
 
   const locations = [...new Set(data.services.map((s) => s.location))].sort()
   const rows = useMemo(() => {
@@ -69,7 +71,14 @@ export default function Services() {
 
   return (
     <div className="page">
-      <PageHead title="Health Services" subtitle="Manage schedules, capacity, and service availability." />
+      <PageHead title="Health Services" subtitle="Manage the deployment schedule, capacity, and resident appointments." />
+      <div className="tabs" role="tablist">
+        <button role="tab" aria-selected={tab === 'schedule'} className={tab === 'schedule' ? 'on' : ''} onClick={() => setTab('schedule')}>Deployment schedule</button>
+        <button role="tab" aria-selected={tab === 'appointments'} className={tab === 'appointments' ? 'on' : ''} onClick={() => setTab('appointments')}>
+          Appointments{data.appointments.filter((a) => a.status === 'PENDING').length > 0 && <span className="count">{data.appointments.filter((a) => a.status === 'PENDING').length}</span>}
+        </button>
+      </div>
+      {tab === 'appointments' ? <AppointmentsBoard /> : (<>
       <div className="stats stats-3">
         <StatCard icon={<CalendarDays size={24} />} tone="blue" label="Scheduled" value={data.services.filter((s) => s.status === 'SCHEDULED').length} note="Upcoming services" onClick={() => setStatus('SCHEDULED')} active={status === 'SCHEDULED'} />
         <StatCard icon={<Activity size={24} />} tone="violet" label="Ongoing" value={data.services.filter((s) => s.status === 'ONGOING').length} note="Running now" onClick={() => setStatus('ONGOING')} active={status === 'ONGOING'} />
@@ -128,6 +137,8 @@ export default function Services() {
         </div>
         <Pager {...paged} onPage={paged.setPage} />
         </section>
+
+      </>)}
 
       <Modal open={!!editing} title={editing?.id ? 'Edit service' : 'Add service'} onClose={() => setEditing(null)}
         footer={<><button className="btn btn-ghost" onClick={() => setEditing(null)}>Cancel</button><button className="btn btn-primary" onClick={save}>{editing?.id ? 'Save changes' : 'Add service'}</button></>}>

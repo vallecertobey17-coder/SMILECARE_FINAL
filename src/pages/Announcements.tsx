@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Megaphone } from 'lucide-react'
 import { useStore } from '../lib/store'
+import { KnowledgeBase } from '../components/KnowledgeBase'
 import type { Announcement, AnnouncementCategory } from '../lib/types'
 import type { Session } from '../lib/auth'
 import { Icon } from '../components/Icon'
@@ -18,7 +19,7 @@ export default function Announcements({ session }: { session: Session }) {
   const [editing, setEditing] = useState<{ id?: string; draft: Draft } | null>(null)
   const [deleting, setDeleting] = useState<Announcement | null>(null)
   const [err, setErr] = useState('')
-  const list = [...data.announcements].filter((a) => !cat || a.category === cat).sort((a, b) => b.date.localeCompare(a.date))
+  const list = cat === 'KB' ? [] : [...data.announcements].filter((a) => !cat || a.category === cat).sort((a, b) => b.date.localeCompare(a.date))
 
   const blank = (): Draft => ({ title: '', body: '', category: 'ROLLING BOTIKA', date: new Date().toISOString(), author: session.name })
   /** Draft a Rolling Botika announcement from the next scheduled deployment. */
@@ -50,7 +51,7 @@ export default function Announcements({ session }: { session: Session }) {
 
   return (
     <div className="page">
-      <PageHead title="Announcements" subtitle="Publish Rolling Botika schedules, service changes, cancellations and advisories to residents."
+      <PageHead title="Announcements" subtitle="Publish schedules, service changes and advisories, and manage the knowledge base Ask SMILE uses."
         actions={!readOnly && (
           <div className="btn-row">
             <button className="btn btn-outline" onClick={fromSchedule}><Megaphone size={18} /> Announce next deployment</button>
@@ -59,9 +60,11 @@ export default function Announcements({ session }: { session: Session }) {
         )} />
       <div className="tabs">
         <button className={cat === '' ? 'on' : ''} onClick={() => setCat('')}>All</button>
+        <button className={cat === 'KB' ? 'on' : ''} onClick={() => setCat('KB')}>Knowledge base (Ask SMILE)</button>
         {CATS.map((c) => <button key={c} className={cat === c ? 'on' : ''} onClick={() => setCat(c)}>{c.charAt(0) + c.slice(1).toLowerCase()}</button>)}
       </div>
-      {list.length === 0 && <section className="card"><Empty text="No announcements yet." /></section>}
+      {cat === 'KB' && <KnowledgeBase />}
+      {cat !== 'KB' && list.length === 0 && <section className="card"><Empty text="No announcements yet." /></section>}
       <div className="ann-list">
         {list.map((a) => (
           <div key={a.id} className="ann">

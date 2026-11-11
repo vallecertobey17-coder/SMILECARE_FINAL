@@ -191,8 +191,8 @@ export interface AuditEntry {
   summary: string
 }
 
-export type StaffRole = 'Administrator' | 'Health Personnel' | 'Pharmacist' | 'Rolling Botika Staff'
-export const STAFF_ROLES: StaffRole[] = ['Administrator', 'Health Personnel', 'Pharmacist', 'Rolling Botika Staff']
+export type StaffRole = 'Administrator' | 'Municipal Health Doctor' | 'Pharmacist' | 'Rolling Botika Staff'
+export const STAFF_ROLES: StaffRole[] = ['Administrator', 'Municipal Health Doctor', 'Pharmacist', 'Rolling Botika Staff']
 export interface Staff {
   id: string
   name: string
@@ -213,6 +213,49 @@ export interface SupportRequest {
   status: 'OPEN' | 'RESOLVED'
 }
 
+/** External entity: medicine and supply suppliers (DFD process 6.0). */
+export interface Supplier {
+  id: string
+  name: string
+  contact: string
+  phone?: string
+  email?: string
+  supplies: string // medicines / supplies they provide
+  leadDays: number // usual delivery time
+  availability?: string // latest stock availability reported by the supplier
+}
+
+export type SupplyOrderStatus = 'REQUESTED' | 'ORDERED' | 'DELIVERED' | 'CANCELLED'
+/** Medicine/supply requirement → purchase order → delivery (DFD process 6.0). */
+export interface SupplyOrder {
+  id: string
+  ref: string
+  medicineId: string
+  label: string
+  qty: number
+  status: SupplyOrderStatus
+  requestedBy: string
+  requestedRole: string
+  reason?: string
+  createdAt: string
+  supplierId?: string
+  supplierName?: string
+  orderedAt?: string
+  expectedDate?: string
+  deliveredAt?: string
+  deliveredQty?: number
+  notes?: string
+}
+
+/** D5 Knowledge base used by Ask SMILE (DFD process 3.0). */
+export interface KnowledgeEntry {
+  id: string
+  question: string
+  answer: string
+  category: string
+  keywords: string // comma-separated
+}
+
 export interface Collections {
   residents: Resident
   medicines: Medicine
@@ -228,6 +271,9 @@ export interface Collections {
   audit: AuditEntry
   staff: Staff
   support: SupportRequest
+  suppliers: Supplier
+  orders: SupplyOrder
+  knowledge: KnowledgeEntry
 }
 export type CollectionName = keyof Collections
 export const COLLECTIONS: CollectionName[] = [
@@ -245,4 +291,7 @@ export const COLLECTIONS: CollectionName[] = [
   'audit',
   'staff',
   'support',
+  'suppliers',
+  'orders',
+  'knowledge',
 ]

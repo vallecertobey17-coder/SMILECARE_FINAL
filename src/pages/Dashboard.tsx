@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { Users, CalendarCheck, ListOrdered, AlertTriangle, ChevronRight, Truck, Building2, Pill, UserCheck, Clock } from 'lucide-react'
 import { useStore } from '../lib/store'
+import { AppointmentsBoard } from '../components/AppointmentsBoard'
 import { can, type Permission, type Session } from '../lib/auth'
 import { Badge, StatCard } from '../components/ui'
 import { daysToExpiry, fmtNum, fmtTime, greeting, isoDate, medicineStatus } from '../lib/utils'
@@ -98,6 +99,8 @@ export default function Dashboard({ go: rawGo, session }: { go: (r: string) => v
           onClick={() => go('inventory')}
         />
       </div>
+
+      {session.role === 'Municipal Health Doctor' && <AppointmentsBoard doctor={session.name} compact />}
 
       <div className="dash-grid">
         <section className="card">

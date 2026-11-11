@@ -72,6 +72,7 @@ export const seed: Seed = {
   ],
   appointments: [
     { id: 'apt-001', ref: 'APT-24001', residentId: 'res-aj', residentName: 'AJ F. Alanzalon', barangay: 'San Juan', kind: 'appointment', serviceId: 'svc-004', serviceName: 'Free Consultation', date: day(6), time: '9:30 - 10:00 AM', location: 'San Juan Covered Court', doctor: 'Dr. Alfredo Pascual', status: 'CONFIRMED', createdAt: at(-2, '13:10') },
+    { id: 'apt-003', ref: 'APT-24003', residentId: 'res-009', residentName: 'Eduardo Tolentino', barangay: 'Dolores', kind: 'appointment', serviceId: 'svc-004', serviceName: 'Free Consultation', date: day(6), time: '10:00 - 10:30 AM', location: 'San Juan Covered Court', doctor: 'Dr. Barbara Pegg', status: 'CONFIRMED', createdAt: at(-1, '09:20'), notes: 'Hypertension follow-up' },
     { id: 'apt-002', ref: 'APT-24002', residentId: 'res-004', residentName: 'Lorna Villanueva', barangay: 'Dolores', kind: 'both', serviceId: 'svc-005', serviceName: 'Eye Check-up', date: day(3), time: '8:00 - 8:30 AM', location: 'Dolores Covered Court', status: 'PENDING', medicines: [{ medicineId: 'med-losartan', label: 'Losartan (50mg)', qty: 30 }], createdAt: at(-1, '18:00') },
   ],
   tickets: [
@@ -105,9 +106,24 @@ export const seed: Seed = {
   audit: [],
   staff: [
     { id: 'stf-admin', name: 'Juan Santos', email: 'admin@smilecare.demo', role: 'Administrator', title: 'Municipal Health Officer', active: true },
-    { id: 'stf-doc', name: 'Dr. Barbara Pegg', email: 'doctor@smilecare.demo', role: 'Health Personnel', title: 'Family Medicine', active: true },
+    { id: 'stf-doc', name: 'Dr. Barbara Pegg', email: 'doctor@smilecare.demo', role: 'Municipal Health Doctor', title: 'Family Medicine', active: true },
+    { id: 'stf-doc2', name: 'Dr. Alfredo Pascual', email: 'apascual@smilecare.demo', role: 'Municipal Health Doctor', title: 'General Medicine', active: true },
     { id: 'stf-rph', name: 'Ana Reyes, RPh', email: 'pharmacist@smilecare.demo', role: 'Pharmacist', title: 'Municipal Pharmacist', active: true },
     { id: 'stf-rb', name: 'Mark Villanueva', email: 'botika@smilecare.demo', role: 'Rolling Botika Staff', title: 'Rolling Botika • San Juan', active: true },
   ],
   support: [],
+  suppliers: [
+    { id: 'sup-001', name: 'Rizal Pharma Distributors', contact: 'Liza Manalo', email: 'orders@rizalpharma.example', supplies: 'Maintenance medicines (Losartan, Amlodipine, Metformin)', leadDays: 5, availability: 'Amlodipine available, ships in 5 days' },
+    { id: 'sup-002', name: 'MedSupply PH', contact: 'Ramon Cruz', email: 'sales@medsupply.example', supplies: 'Antibiotics, analgesics, ORS, vitamins', leadDays: 3 },
+  ],
+  orders: [
+    { id: 'ord-001', ref: 'PO-' + day(-3).replace(/-/g, '').slice(2) + '-01', medicineId: 'med-amlodipine', label: 'Amlodipine (5mg)', qty: 1000, status: 'ORDERED', requestedBy: 'Dr. Barbara Pegg', requestedRole: 'Municipal Health Doctor', reason: 'Out of stock; hypertension patients waiting', createdAt: at(-4, '10:00'), supplierId: 'sup-001', supplierName: 'Rizal Pharma Distributors', orderedAt: at(-3, '09:00'), expectedDate: day(2) },
+    { id: 'ord-002', ref: 'REQ-' + day(-1).replace(/-/g, '').slice(2) + '-01', medicineId: 'med-amoxicillin', label: 'Amoxicillin (500mg)', qty: 300, status: 'REQUESTED', requestedBy: 'Dr. Barbara Pegg', requestedRole: 'Municipal Health Doctor', reason: 'Low stock for upcoming consultations', createdAt: at(-1, '15:30') },
+  ],
+  knowledge: [
+    { id: 'kb-001', category: 'Rolling Botika', question: 'What is the Rolling Botika?', answer: 'The Rolling Botika is the mobile pharmacy and health service of the Municipality of Taytay. It visits barangays to give free consultations, blood sugar screenings, medicines, eye and dental check-ups, and vaccinations.', keywords: 'what is the rolling botika, ano ang rolling botika, what is rolling botika' },
+    { id: 'kb-002', category: 'Eligibility', question: 'Who can get free medicines?', answer: 'Verified residents of Taytay can receive free medicines, subject to availability. Some medicines (like antibiotics) need a prescription from a doctor.', keywords: 'free, eligible, libre, who can' },
+    { id: 'kb-003', category: 'Requirements', question: 'What should I bring to the Rolling Botika?', answer: 'Bring your SMILECare QR Health ID (or Health ID number), a valid ID, and your prescription if your medicine needs one.', keywords: 'bring, requirements, dalhin, id' },
+    { id: 'kb-004', category: 'Account', question: 'How do I get verified?', answer: 'Register in SMILECare and upload one valid ID or barangay certificate showing your Taytay address. The Municipal Health Office reviews it, usually within a few days.', keywords: 'verify, verification, approved, pending' },
+  ],
 }

@@ -4,6 +4,8 @@ import { Icon } from '../components/Icon'
 import { useStore } from '../lib/store'
 import type { Medicine, MedicineStatus } from '../lib/types'
 import { UnitStock } from '../components/UnitStock'
+import { SupplyOrders } from '../components/SupplyOrders'
+import type { Session } from '../lib/auth'
 import { Badge, RowMenu, Confirm, Empty, Field, Modal, PageHead, Pager, StatCard, Toolbar, usePaged, useToast } from '../components/ui'
 import { fmtMonth, fmtNum, medicineStatus } from '../lib/utils'
 
@@ -12,8 +14,11 @@ const FORMS = ['tablet', 'capsule', 'syrup', 'suspension', 'injection', 'ointmen
 type Draft = Omit<Medicine, 'id'>
 const blank = (): Draft => ({ name: '', strength: '', form: 'tablet', stock: 0, unit: 'blister packs', expiry: '', reorderLevel: 100, location: '' })
 
-export default function Inventory() {
-  const { data, add, update, remove, readOnly } = useStore()
+export default function Inventory({ session }: { session: Session }) {
+  const store = useStore()
+  const { data, add, update, remove } = store
+  // Doctors receive medicine inventory information (view only) and send supply requirements.
+  const readOnly = store.readOnly || session.role === 'Municipal Health Doctor'
   const toast = useToast()
   const [q, setQ] = useState('')
   const [status, setStatus] = useState('')
@@ -25,7 +30,7 @@ export default function Inventory() {
   const [restockOpen, setRestockOpen] = useState(false)
   const [deleting, setDeleting] = useState<Medicine | null>(null)
   const [err, setErr] = useState('')
-  const [view, setView] = useState<'central' | 'units'>('central')
+  const [view, setView] = useState<'central' | 'units' | 'orders'>('central')
 
   const withStatus = useMemo(() => data.medicines.map((m) => ({ m, st: medicineStatus(m) })), [data.medicines])
   const totalUnits = data.medicines.reduce((a, m) => a + (m.stock || 0), 0)
@@ -95,9 +100,10 @@ export default function Inventory() {
       <div className="tabs" role="tablist">
         <button role="tab" aria-selected={view === 'central'} className={view === 'central' ? 'on' : ''} onClick={() => setView('central')}>Central health office</button>
         <button role="tab" aria-selected={view === 'units'} className={view === 'units' ? 'on' : ''} onClick={() => setView('units')}>Rolling Botika units</button>
+        <button role="tab" aria-selected={view === 'orders'} className={view === 'orders' ? 'on' : ''} onClick={() => setView('orders')}>Suppliers &amp; orders{data.orders.filter((o) => o.status === 'REQUESTED').length > 0 && <span className="count">{data.orders.filter((o) => o.status === 'REQUESTED').length}</span>}</button>
       </div>
 
-      {view === 'units' ? <UnitStock /> : (<>
+      {view === 'orders' ? <SupplyOrders session={session} /> : view === 'units' ? <UnitStock readOnly={readOnly} /> : (<>
       <Toolbar
           search={q} onSearch={setQ} placeholder="Search Inventory..." status={status} onStatus={setStatus} statuses={STATUSES}
           filtersOpen={showFilters} onToggleFilters={() => setShowFilters((v) => !v)} filterCount={form ? 1 : 0}

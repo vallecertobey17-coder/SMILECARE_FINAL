@@ -4,6 +4,8 @@ import { useStore } from '../../lib/store'
 import { useResident } from './context'
 import { Icon } from '../../components/Icon'
 import { Empty, useToast } from '../../components/ui'
+import { Weather } from '../../components/Weather'
+import { TaytayMap, type MapPin as Pin } from '../../components/TaytayMap'
 import { BARANGAYS, fmtTime, isoDate, medicineStatus } from '../../lib/utils'
 import type { Service } from '../../lib/types'
 
@@ -61,6 +63,21 @@ export default function RSchedule() {
       .sort((a, b) => b.qty - a.qty)
   }
 
+  const pins = useMemo<Pin[]>(
+    () =>
+      BARANGAYS.map((b) => {
+        const n = data.services.filter((s) => s.barangay === b && s.date >= today && s.status !== 'CANCELLED' && s.status !== 'COMPLETED').sort((a, x) => a.date.localeCompare(x.date))[0]
+        return {
+          barangay: b,
+          title: n ? `${n.date === today ? 'Today' : 'Next visit ' + new Date(n.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} • ${fmtTime(n.start)} - ${fmtTime(n.end)}` : 'No visit scheduled yet',
+          detail: n ? n.location : undefined,
+          today: n?.date === today,
+          mine: b === resident.barangay,
+        }
+      }),
+    [data.services, today, resident.barangay],
+  )
+
   const nextFor = (b: string) => data.services.filter((s) => s.barangay === b && s.date >= today && s.status !== 'CANCELLED' && s.status !== 'COMPLETED').sort((a, x) => a.date.localeCompare(x.date))[0]
 
   return (
@@ -78,6 +95,27 @@ export default function RSchedule() {
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search barangay or location" aria-label="Search barangay or location" />
         </div>
       </div>
+
+      <section className="card map-card">
+        <div className="card-head">
+          <div>
+            <h3>Taytay, Rizal map &amp; weather</h3>
+            <p className="muted small">Tap a pin to see that barangay's Rolling Botika schedule.</p>
+          </div>
+          {q && <button className="btn btn-outline sm" onClick={() => setQ('')}>Show all barangays</button>}
+        </div>
+        <div className="map-weather">
+          <div>
+            <TaytayMap pins={pins} selected={BARANGAYS.find((b) => b.toLowerCase() === q.trim().toLowerCase())} onSelect={(b) => setQ(b)} />
+            <div className="map-legend">
+              <span><i className="lg-dot today" /> Visit today</span>
+              <span><i className="lg-dot" /> Upcoming / none</span>
+              <span><i className="lg-dot mine" /> Your barangay</span>
+            </div>
+          </div>
+          <Weather />
+        </div>
+      </section>
 
       <section className="card">
         <div className="card-head">

@@ -39,7 +39,7 @@ export default function Consultations({ session }: { session: Session }) {
   }, [data.consultations, q, type, loc])
   const paged = usePaged(rows, 8, q + type + loc)
 
-  const blank = (): Draft => ({ residentName: '', date: new Date().toISOString().slice(0, 16), type: TYPES[0], doctor: session.role === 'Health Personnel' ? session.name : '', location: data.units.find((u) => u.status !== 'CLOSED')?.name ?? 'Municipal Health Office' })
+  const blank = (): Draft => ({ residentName: '', date: new Date().toISOString().slice(0, 16), type: TYPES[0], doctor: session.role === 'Municipal Health Doctor' ? session.name : '', location: data.units.find((u) => u.status !== 'CLOSED')?.name ?? 'Municipal Health Office' })
 
   async function save() {
     if (!editing) return

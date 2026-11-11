@@ -20,8 +20,8 @@ export async function getCapability<T = any>(name: string): Promise<T | null> {
 }
 
 /* ---------- local storage helpers ---------- */
-const LS_PREFIX = 'smilecare:v2:data:'
-const OUTBOX = 'smilecare:v2:outbox'
+const LS_PREFIX = 'smilecare:v3:data:'
+const OUTBOX = 'smilecare:v3:outbox'
 function lsGet<T>(key: string): T | null {
   try {
     const raw = localStorage.getItem(key)

@@ -110,7 +110,7 @@ export type Permission =
 
 export const ROLE_ACCESS: Record<StaffRole, Permission[]> = {
   Administrator: ['dashboard', 'residents', 'inventory', 'services', 'dispensing', 'consultations', 'vaccinations', 'botika', 'announcements', 'analytics', 'staff', 'backup'],
-  'Health Personnel': ['dashboard', 'residents', 'services', 'dispensing', 'consultations', 'vaccinations', 'botika', 'announcements', 'analytics'],
+  'Municipal Health Doctor': ['dashboard', 'residents', 'inventory', 'services', 'consultations', 'vaccinations', 'announcements', 'analytics'],
   Pharmacist: ['dashboard', 'residents', 'inventory', 'dispensing', 'botika', 'analytics'],
   'Rolling Botika Staff': ['dashboard', 'residents', 'inventory', 'dispensing', 'consultations', 'botika'],
 }

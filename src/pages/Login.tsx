@@ -37,7 +37,7 @@ async function compressImage(file: File): Promise<string | undefined> {
 const DEMOS: { label: string; email: string; kind: AccountKind; name: string }[] = [
   { label: 'Resident', email: 'aj@smilecare.demo', kind: 'resident', name: 'AJ F. Alanzalon' },
   { label: 'Administrator', email: 'admin@smilecare.demo', kind: 'staff', name: 'Juan Santos' },
-  { label: 'Health Personnel', email: 'doctor@smilecare.demo', kind: 'staff', name: 'Dr. Barbara Pegg' },
+  { label: 'Doctor', email: 'doctor@smilecare.demo', kind: 'staff', name: 'Dr. Barbara Pegg' },
   { label: 'Pharmacist', email: 'pharmacist@smilecare.demo', kind: 'staff', name: 'Ana Reyes, RPh' },
   { label: 'Rolling Botika Staff', email: 'botika@smilecare.demo', kind: 'staff', name: 'Mark Villanueva' },
 ]

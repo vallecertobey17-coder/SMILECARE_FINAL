@@ -168,7 +168,7 @@ function StaffApp({ session, route, go, onLogout, onSession }: { session: Sessio
   const pages: Record<string, ReactNode> = {
     dashboard: <Dashboard go={go} session={session} />,
     residents: <Residents session={session} />,
-    inventory: <Inventory />,
+    inventory: <Inventory session={session} />,
     services: <Services />,
     dispensing: <Dispensing session={session} />,
     consultations: <Consultations session={session} />,

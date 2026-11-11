@@ -52,6 +52,8 @@ export default function AskSmile() {
       ...medicines.map((m) => `- ${medLabel(m)} | ${m.purpose ?? ''} | ${m.usage ?? ''} | ${availability(m.id).map((a) => `${a.where}: ${a.qty} ${m.unit}`).join('; ') || 'not available right now'}`),
       'UPCOMING ROLLING BOTIKA / HEALTH SERVICE SCHEDULES:',
       ...schedules.map((s) => `- ${fmtDate(s.date)} ${fmtTime(s.start)}-${fmtTime(s.end)} | ${s.name} | ${s.location} (Brgy. ${s.barangay ?? '-'}) | ${Math.max(0, s.capacity - s.booked)} slots left`),
+      'KNOWLEDGE BASE (approved answers from the Municipal Health Office):',
+      ...data.knowledge.map((k) => `- Q: ${k.question} A: ${k.answer}`),
       "RESIDENT'S UPCOMING BOOKINGS:",
       ...(myAppts.length ? myAppts.map((a) => `- ${a.ref} ${a.serviceName ?? 'Medicine request'} on ${fmtDate(a.date)} ${a.time ?? ''} at ${a.location} (${a.status})`) : ['- none']),
     ].join('\n')
@@ -72,11 +74,16 @@ ${context()}`
   function localAnswer(q: string): string {
     const t = q.toLowerCase()
     if (EMERGENCY.test(q)) return 'This sounds like it could be an emergency. Please call 911 or go to the nearest hospital right away.'
+    const kb = data.knowledge
+      .map((k) => ({ k, hits: k.keywords.split(',').map((w) => w.trim().toLowerCase()).filter((w) => w && t.includes(w)).length + (t.includes(k.question.toLowerCase().replace(/\?$/, '')) ? 3 : 0) }))
+      .filter((x) => x.hits > 0)
+      .sort((a, b) => b.hits - a.hits)[0]
     const med = medicines.find((m) => t.includes(m.name.toLowerCase().split(' ')[0]))
     if (med) {
       const av = availability(med.id)
       return `${medLabel(med)} — ${med.purpose ?? 'no recorded purpose'}.\n${med.usage ? `Basic usage: ${med.usage}\n` : ''}${av.length ? `Available at: ${av.map((a) => `${a.where} (${a.qty})`).join(', ')}.` : 'It is not available at any site right now.'}\nThis is general information only — please follow your doctor's advice.`
     }
+    if (kb && !/sched|kailan|when|where|saan|next visit/.test(t)) return kb.k.answer
     if (/sched|botika|kailan|when|where|saan|visit/.test(t))
       return schedules.length
         ? `Upcoming Rolling Botika and health services:\n${schedules.slice(0, 5).map((s) => `• ${fmtDate(s.date)}, ${fmtTime(s.start)}–${fmtTime(s.end)}: ${s.name} at ${s.location}`).join('\n')}\nSee all in Schedule.`

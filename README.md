@@ -16,13 +16,34 @@ On the sign-in page, tap a demo chip to sign in instantly (password `SmileCare20
 | --- | --- | --- |
 | Resident | aj@smilecare.demo | Resident platform (AJ F. Alanzalon, verified) |
 | Administrator | admin@smilecare.demo | Everything, including Staff & Roles and Backup |
-| Health Personnel | doctor@smilecare.demo | Consultations, vaccinations, services, analytics |
+| Doctor | doctor@smilecare.demo | Municipal Health Doctor: appointment schedule, consultations, vaccinations, inventory (view) & supply requests, analytics |
 | Pharmacist | pharmacist@smilecare.demo | Inventory, dispensing, analytics |
 | Rolling Botika Staff | botika@smilecare.demo | Unit inventory, E-Pila, dispensing, consultations |
 
 You can also register a new resident (with ID upload) and verify them as the Administrator.
 
 Data is sample data saved in your browser. **Settings → Reset demo data** restores it.
+
+## How the system follows the DFD
+
+| DFD element | In SMILECare |
+| --- | --- |
+| **External entities** | Taytayeños (Residents) → resident platform • Municipal Health Office Staff → Administrator, Pharmacist and Rolling Botika Staff roles • Municipal Health Doctor → Doctor role • Suppliers → Medicine Inventory → Suppliers & orders |
+| **1.0 Manage User Account** | Registration with resident document, verification status, staff accounts (Staff & Roles), audit log entries |
+| **2.0 Schedule Appointment** | Resident booking → appointment confirmation and E-Pila queue ticket; staff see the Appointment Requests and Queue lists in Health Services → Appointments |
+| **3.0 Provide Information** | Announcements, notifications, schedule & availability, Ask SMILE chatbot (uses D5 Knowledge base) |
+| **4.0 Record Health Service** | Consultations (medical assessment, recommendations) and vaccinations → resident health records |
+| **5.0 Generate Health Analytics** | Analytics & Reports (overview, health mapping), sent to staff and doctors |
+| **6.0 Monitor Medicine Inventory** | Central & unit stock, inventory alerts, doctor's medicine/supply requirements, supplier orders, deliveries and stock availability |
+| **7.0 Generate Schedule** | Analytics → Deployment planner (deployment recommendation from appointment requests and health data) |
+| **8.0 Manage Deployment Schedule** | Health Services → Deployment schedule (shown to residents in Schedule, and to doctors as their appointment schedule) |
+| **D1 Resident Record** | `residents` |
+| **D2 Appointment & Queue Record** | `appointments`, `tickets` |
+| **D3 Medicine Inventory** | `medicines`, unit stock, `orders`, `suppliers` |
+| **D4 Schedule Record** | `services`, `units` |
+| **D5 Knowledge base** | `knowledge` (Announcements → Knowledge base) |
+| **D6 Health Record** | `consultations`, `vaccinations`, `dispensings` |
+| **D7 Audit Log** | `audit` (Analytics → System audit trail) |
 
 ## Feature map (proposal → system)
 
@@ -60,7 +81,8 @@ Data is sample data saved in your browser. **Settings → Reset demo data** rest
 1. **Homepage** → programs, platforms, team.
 2. **Resident** chip → Home → Schedule (check availability) → Appointment & E-Pila (book + request medicine, get a queue number) → Ask SMILE → Profile & QR ID.
 3. **Administrator** chip → Residents (scan `SC-TAY-2024-018429`, verify Roberto Mendoza) → Dispensing (eligibility check, release) → Rolling Botika & E-Pila (Call next) → Analytics tabs → Settings (backup).
-4. **Pharmacist** chip → show the smaller, role-based menu.
+4. **Doctor** chip → appointment schedule on the dashboard, Medicine Inventory → Suppliers & orders → request medicine; then as **Administrator**, order it from a supplier and record the delivery (stock goes up).
+5. **Pharmacist** chip → show the smaller, role-based menu.
 
 ## Tech stack
 
