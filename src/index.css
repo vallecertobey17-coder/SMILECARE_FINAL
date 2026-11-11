@@ -1001,3 +1001,22 @@ blockquote cite { display: block; margin-top: 10px; font-style: normal; font-wei
 @media (max-width: 760px) { .lp-brand img { height: 56px; } .lp-brand small { display: none; } .header-logo .logo-img { height: 38px; } }
 .logo-img { align-self: flex-start; object-fit: contain; max-width: 100%; }
 .auth-hero .logo-img.light { height: 104px; }
+
+/* SMILECare logo (Happy Capsule) */
+.brand-logo { display: inline-flex; align-items: center; gap: calc(var(--bl) * .22); font-family: 'Plus Jakarta Sans', var(--font); line-height: 1; }
+.brand-logo svg { flex-shrink: 0; }
+.brand-name { display: block; font-size: calc(var(--bl) * .56); letter-spacing: -.03em; white-space: nowrap; }
+.brand-name b { font-weight: 800; color: #0b2f47; }
+.brand-name i { font-style: normal; font-weight: 700; color: #137fb9; }
+.brand-wm small { display: block; font-size: 13px; font-weight: 600; color: #586776; margin-top: 6px; letter-spacing: 0; }
+.brand-logo.light .brand-name b { color: #fff; }
+.brand-logo.light .brand-name i { color: #9fd6ff; }
+.lp-brand { gap: 0; }
+@media (max-width: 760px) { .lp-brand .brand-wm small { display: none; } .header-logo .brand-logo { --bl: 38px !important; } }
+.lp-brand .brand-wm small { border: 0; padding: 0; max-width: none; font-size: 13px; }
+.lp-brand .brand-name b, .lp-brand .brand-name i { display: inline; font-size: inherit; line-height: 1; margin: 0; }
+@media (max-width: 760px) {
+  .lp-nav .brand-logo { --bl: 40px !important; }
+  .lp-nav .brand-logo svg { width: 40px; height: 40px; }
+  .lp-nav .lp-btn { padding: 0 14px; font-size: 15px; height: 42px; }
+}

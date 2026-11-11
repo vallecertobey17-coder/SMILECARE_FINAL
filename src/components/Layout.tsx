@@ -5,8 +5,7 @@ import { useStore } from '../lib/store'
 import { initials } from '../lib/utils'
 import { Modal } from './ui'
 import { PROJECT } from '../config'
-import logoBlue from '../assets/brand/logo-blue.png'
-import logoWhite from '../assets/brand/logo-white.png'
+import { BrandLogo } from './BrandMark'
 
 export interface NavItem {
   id: string
@@ -26,7 +25,7 @@ export interface Notice {
 const renderIcon = (icon: NavItem['icon']) => (isValidElement(icon) ? icon : <Icon name={icon as IconName} />)
 
 export function Logo({ light }: { light?: boolean }) {
-  return <img className={`logo-img ${light ? 'light' : ''}`} src={light ? logoWhite : logoBlue} alt="SMILECare" />
+  return <BrandLogo size={light ? 56 : 46} light={light} />
 }
 
 export function Layout({

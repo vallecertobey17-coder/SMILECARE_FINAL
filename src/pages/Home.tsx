@@ -1,14 +1,12 @@
 import { useState } from 'react'
 import { ChevronRight, CalendarCheck, ShieldCheck, Check, Truck, History, MessageSquareText, Pill, X, HelpCircle } from 'lucide-react'
 import { MUNICIPALITY, PROJECT } from '../config'
-import logoBlue from '../assets/brand/logo-blue.png'
-import markBlue from '../assets/brand/mark-blue.png'
+import { BrandLogo, BrandMark } from '../components/BrandMark'
 
 function Brand({ small }: { small?: boolean }) {
   return (
     <div className={`lp-brand ${small ? 'sm' : ''}`}>
-      <img src={logoBlue} alt="SMILECare" />
-      <small>Taytay Health, Closer to You</small>
+      <BrandLogo size={small ? 56 : 64} tagline="Taytay Health, Closer to You" />
     </div>
   )
 }
@@ -68,7 +66,7 @@ export default function Home({ onLogin }: { onLogin: (kind: 'resident' | 'staff'
           <div className="lp-ring" />
           <div className="lp-phone">
             <div className="lp-phone-top">
-              <img src={markBlue} alt="" width={26} height={38} />
+              <BrandMark size={40} />
               <span>9:41</span>
             </div>
             <p className="lp-greet">Magandang umaga,</p>
