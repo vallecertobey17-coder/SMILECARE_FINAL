@@ -1,5 +1,18 @@
 import { useMemo } from 'react'
-import { Users, CalendarCheck, ListOrdered, AlertTriangle, ChevronRight, Truck, Building2, Pill, UserCheck, Clock } from 'lucide-react'
+import { Users, CalendarCheck, ListOrdered, AlertTriangle, ChevronRight, Truck, Building2, Pill, UserCheck, Clock, Stethoscope, Droplet, Eye, Smile, Syringe, Baby, HeartPulse, type LucideIcon } from 'lucide-react'
+
+/** Colour, icon and stream label for each health service (Services today cards). */
+function serviceStyle(name: string): { color: string; color2: string; icon: LucideIcon; stream: string } {
+  const n = name.toLowerCase()
+  if (n.includes('blood sugar')) return { color: '#3b2f9e', color2: '#6a5cf0', icon: Droplet, stream: 'Triage screening' }
+  if (n.includes('blood pressure')) return { color: '#3b2f9e', color2: '#6a5cf0', icon: HeartPulse, stream: 'Triage vital checks' }
+  if (n.includes('medicine') || n.includes('dispens') || n.includes('botika')) return { color: '#2e7d5b', color2: '#02a070', icon: Pill, stream: 'Pharmacy dispensary' }
+  if (n.includes('eye')) return { color: '#0b7f8c', color2: '#22b5c4', icon: Eye, stream: 'Vision screening' }
+  if (n.includes('dental')) return { color: '#b45309', color2: '#f59e0b', icon: Smile, stream: 'Dental clinic' }
+  if (n.includes('vaccin')) return { color: '#7c3aed', color2: '#a78bfa', icon: Syringe, stream: 'Immunization' }
+  if (n.includes('maternal') || n.includes('pediatric')) return { color: '#c81e2b', color2: '#ff6b6b', icon: Baby, stream: n.includes('maternal') ? 'OB-GYN & infant center' : 'Pediatrics' }
+  return { color: '#006398', color2: '#2a9fd8', icon: Stethoscope, stream: 'OPD clinical stream' }
+}
 import { useStore } from '../lib/store'
 import { AppointmentsBoard } from '../components/AppointmentsBoard'
 import { can, type Permission, type Session } from '../lib/auth'
@@ -34,7 +47,7 @@ export default function Dashboard({ go: rawGo, session }: { go: (r: string) => v
   const quotaServices = (stats.todays.length
     ? stats.todays
     : [...data.services].filter((s) => s.date >= todayIso).sort((a, b) => a.date.localeCompare(b.date))
-  ).slice(0, 4)
+  ).slice(0, 6)
 
   const dateLabel = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase()
 
@@ -189,32 +202,38 @@ export default function Dashboard({ go: rawGo, session }: { go: (r: string) => v
         </section>
       </div>
 
-      <section className="card">
-        <div className="card-head">
+      <section className="card svc-today">
+        <div className="svc-today-head">
           <div>
             <h3>Services today</h3>
             <p className="muted small">Real-time throughput quota across all clinical centers &amp; mobile units</p>
           </div>
-          <span className="muted small">
-            Last updated {now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+          <span className="updated-pill">
+            <i /> Last Updated: <b>{now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</b>
           </span>
         </div>
         {quotaServices.length === 0 && <p className="muted pad">No services scheduled.</p>}
-        <div className="quotas">
+        <div className="svc-grid">
           {quotaServices.map((s) => {
             const pct = s.capacity ? Math.min(100, Math.round((s.booked / s.capacity) * 100)) : 0
+            const st = serviceStyle(s.category || s.name)
+            const Icon = st.icon
             return (
-              <button key={s.id} className="quota" onClick={() => go('services')}>
-                <div className="quota-top">
-                  <b>{s.name}</b>
-                  <span>
-                    {s.booked} / {s.capacity}
+              <button key={s.id} className="svc-card" style={{ ['--c' as string]: st.color, ['--c2' as string]: st.color2 }} onClick={() => go('services')}>
+                <span className="svc-ic"><Icon size={26} strokeWidth={1.8} /></span>
+                <span className="svc-body">
+                  <span className="svc-top">
+                    <span className="svc-name">
+                      <b>{s.name}</b>
+                      <small>{st.stream} • {s.location}</small>
+                    </span>
+                    <span className="svc-count"><b>{s.booked}</b> / {s.capacity}</span>
                   </span>
-                </div>
-                <small className="muted">{s.category || s.location}</small>
-                <div className="bar">
-                  <span style={{ width: pct + '%' }} className={pct >= 90 ? 'full' : ''} />
-                </div>
+                  <span className="svc-bar" role="progressbar" aria-valuenow={s.booked} aria-valuemin={0} aria-valuemax={s.capacity} aria-label={`${s.name} ${pct}% of capacity`}>
+                    <span style={{ width: Math.max(pct, s.booked ? 3 : 0) + '%' }} />
+                  </span>
+                </span>
+                {pct >= 100 && <span className="svc-full">Full</span>}
               </button>
             )
           })}

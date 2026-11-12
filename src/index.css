@@ -1020,3 +1020,37 @@ blockquote cite { display: block; margin-top: 10px; font-style: normal; font-wei
   .lp-nav .brand-logo svg { width: 40px; height: 40px; }
   .lp-nav .lp-btn { padding: 0 14px; font-size: 15px; height: 42px; }
 }
+
+/* Services today (admin dashboard) */
+.svc-today { padding: 28px 30px 30px; }
+.svc-today-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding-bottom: 18px; margin-bottom: 22px; border-bottom: 1px solid #e3e8ee; flex-wrap: wrap; }
+.svc-today-head h3 { font-size: 24px; font-weight: 500; }
+.svc-today-head p { margin-top: 6px; font-size: 14.5px; }
+.updated-pill { display: inline-flex; align-items: center; gap: 8px; background: #b9e6d6; border: 1px solid #5fbf9b; color: #00566e; border-radius: 12px; padding: 8px 16px; font-size: 14px; font-weight: 600; white-space: nowrap; }
+.updated-pill i { width: 7px; height: 7px; border-radius: 50%; background: #1f7a5c; }
+.updated-pill b { font-weight: 700; }
+.svc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 36px; }
+.svc-card { position: relative; display: flex; gap: 16px; align-items: flex-start; text-align: left; background: #fcfdfe; border: 1px solid #2f7fb0; border-radius: 16px; padding: 22px 30px 24px 32px; transition: box-shadow .15s, transform .15s; }
+.svc-card:hover { box-shadow: 0 6px 16px rgba(0, 60, 100, .12); transform: translateY(-1px); }
+.svc-ic { width: 60px; height: 60px; border-radius: 12px; display: grid; place-items: center; color: #fff; flex-shrink: 0; background: linear-gradient(180deg, var(--c2), var(--c)); box-shadow: 0 3px 8px rgba(0, 0, 0, .12); }
+.svc-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+.svc-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
+.svc-name { min-width: 0; }
+.svc-name b { display: block; font-size: 22px; font-weight: 600; color: #3a3a3a; letter-spacing: -.01em; }
+.svc-name small { display: block; font-size: 15.5px; color: #757575; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.svc-count { font-size: 18px; color: #9aa3ab; white-space: nowrap; }
+.svc-count b { font-size: 24px; font-weight: 700; color: var(--c); }
+.svc-bar { display: block; height: 14px; border-radius: 10px; background: #e8e8e8; overflow: hidden; margin-left: -76px; }
+.svc-bar span { display: block; height: 100%; border-radius: inherit; background: var(--c); transition: width .4s; }
+.svc-full { position: absolute; top: 12px; right: 14px; font-size: 11px; font-weight: 700; color: var(--c); background: #fff; border: 1px solid var(--c); border-radius: 10px; padding: 2px 8px; }
+@media (max-width: 1200px) { .svc-grid { gap: 18px; } .svc-card { padding: 20px 22px 22px 26px; } }
+@media (max-width: 900px) { .svc-grid { grid-template-columns: 1fr; } }
+@media (max-width: 640px) {
+  .svc-today { padding: 20px 16px; }
+  .svc-card { padding: 16px; gap: 12px; }
+  .svc-ic { width: 48px; height: 48px; }
+  .svc-name b { font-size: 18px; }
+  .svc-name small { font-size: 13.5px; white-space: normal; }
+  .svc-count b { font-size: 20px; }
+  .svc-bar { margin-left: -60px; height: 12px; }
+}
