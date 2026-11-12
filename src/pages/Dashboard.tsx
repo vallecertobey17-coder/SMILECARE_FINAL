@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Users, CalendarCheck, ListOrdered, AlertTriangle, ChevronRight, Truck, Building2, Pill, UserCheck, Clock, Stethoscope, Droplet, Eye, Smile, Syringe, Baby, HeartPulse, type LucideIcon } from 'lucide-react'
+import { ChevronRight, Truck, Building2, Pill, UserCheck, Stethoscope, Droplet, Eye, Smile, Syringe, Baby, HeartPulse, type LucideIcon } from 'lucide-react'
 
 /** Colour, icon and stream label for each health service (Services today cards). */
 function serviceStyle(name: string): { color: string; color2: string; icon: LucideIcon; stream: string } {
@@ -16,7 +16,8 @@ function serviceStyle(name: string): { color: string; color2: string; icon: Luci
 import { useStore } from '../lib/store'
 import { AppointmentsBoard } from '../components/AppointmentsBoard'
 import { can, type Permission, type Session } from '../lib/auth'
-import { Badge, StatCard } from '../components/ui'
+import { StatCard } from '../components/ui'
+import { Icon } from '../components/Icon'
 import { daysToExpiry, fmtNum, fmtTime, greeting, isoDate, medicineStatus } from '../lib/utils'
 
 export default function Dashboard({ go: rawGo, session }: { go: (r: string) => void; session: Session }) {
@@ -81,14 +82,14 @@ export default function Dashboard({ go: rawGo, session }: { go: (r: string) => v
 
       <div className="stats">
         <StatCard
-          icon={<Users size={24} />}
+          icon={<Icon name="residents" />}
           label="Registered residents"
           value={loaded ? fmtNum(data.residents.length) : '—'}
           note={`+${stats.thisMonth} this month`}
           onClick={() => go('residents')}
         />
         <StatCard
-          icon={<CalendarCheck size={24} />}
+          icon={<Icon name="r-book" />}
           tone="blue"
           label="Appointments today"
           value={loaded ? fmtNum(stats.appointments) : '—'}
@@ -96,7 +97,7 @@ export default function Dashboard({ go: rawGo, session }: { go: (r: string) => v
           onClick={() => go('services')}
         />
         <StatCard
-          icon={<ListOrdered size={24} />}
+          icon={<Icon name="r-epila" />}
           tone="violet"
           label="Active E-Pila"
           value={loaded ? fmtNum(stats.queue) : '—'}
@@ -104,11 +105,11 @@ export default function Dashboard({ go: rawGo, session }: { go: (r: string) => v
           onClick={() => go('botika')}
         />
         <StatCard
-          icon={<AlertTriangle size={24} />}
+          icon={<Icon name="inventory" />}
           tone="orange"
           label="Inventory alerts"
           value={loaded ? stats.alerts.length : '—'}
-          note={stats.alerts.length ? 'Needs attention' : 'All good'}
+          note={stats.alerts.length ? <span className="note-red">Needs attention</span> : 'All good'}
           onClick={() => go('inventory')}
         />
       </div>
@@ -116,22 +117,24 @@ export default function Dashboard({ go: rawGo, session }: { go: (r: string) => v
       {session.role === 'Municipal Health Doctor' && <AppointmentsBoard doctor={session.name} compact />}
 
       <div className="dash-grid">
-        <section className="card">
+        <section className="card dash-card">
           <div className="card-head">
             <h3>Today's operations</h3>
-            <button className="link-btn" onClick={() => go('botika')}>
-              Manage all units <ChevronRight size={18} />
+            <button className="pill-btn" onClick={() => go('botika')}>
+              Manage all units <ChevronRight size={16} />
             </button>
           </div>
           {stats.activeUnits.length === 0 && <p className="muted pad">No units are operating right now.</p>}
           <div className="units">
             {stats.activeUnits.slice(0, 3).map((u) => (
               <div key={u.id} className="unit">
-                <div className={`unit-icon ${u.kind === 'Rolling Botika' ? 'tone-teal' : 'tone-blue'}`}>
-                  {u.kind === 'Rolling Botika' ? <Truck size={22} /> : <Building2 size={22} />}
+                <div className={`unit-tile ${u.kind === 'Rolling Botika' ? 'rb' : 'ho'}`}>
+                  {u.kind === 'Rolling Botika' ? <Truck size={30} strokeWidth={1.7} /> : <Building2 size={30} strokeWidth={1.7} />}
                 </div>
                 <div className="unit-main">
-                  <Badge status={u.status} />
+                  <span className="unit-pillrow">
+                    <span className={`dot-pill ${u.status === 'IN PROGRESS' ? 'blue' : 'green'}`}><i />{u.status}</span>
+                  </span>
                   <b>{u.name}</b>
                   <small className="muted">
                     {u.description || u.location} • Until {fmtTime(u.until)}
@@ -152,7 +155,7 @@ export default function Dashboard({ go: rawGo, session }: { go: (r: string) => v
           </div>
         </section>
 
-        <section className="card">
+        <section className="card dash-card">
           <div className="card-head">
             <h3>Alerts &amp; Actions</h3>
             {stats.alerts.length + (pending.length ? 1 : 0) > 0 && (
@@ -165,7 +168,7 @@ export default function Dashboard({ go: rawGo, session }: { go: (r: string) => v
               return (
                 <button key={m.id} className="alert-item" onClick={() => go('inventory')}>
                   <span className={`ai-icon ${st === 'EXPIRING SOON' ? 'tone-orange' : 'tone-red'}`}>
-                    {st === 'EXPIRING SOON' || st === 'EXPIRED' ? <Clock size={18} /> : <Pill size={18} />}
+                    <Pill size={24} strokeWidth={1.8} />
                   </span>
                   <span>
                     <b>

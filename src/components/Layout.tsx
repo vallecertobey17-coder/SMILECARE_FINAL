@@ -125,6 +125,9 @@ export function Layout({
 
       <div className="main">
         <header className="header">
+          <button className="icon-btn only-mobile menu-btn" onClick={() => setDrawer(true)} aria-label="Open menu">
+            <Menu size={28} strokeWidth={2.4} />
+          </button>
           <span className="only-mobile header-logo">
             <Logo />
           </span>
