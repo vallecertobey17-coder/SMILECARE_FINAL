@@ -1149,3 +1149,74 @@ blockquote cite { display: block; margin-top: 10px; font-style: normal; font-wei
   .dash-card .card-head h3 { font-size: 19px; }
   .pill-btn { height: 34px; padding: 0 10px; font-size: 13px; }
 }
+
+/* ===== Responsive pass ===== */
+/* Mobile bottom bar: one line, swipe to see every item */
+@media (max-width: 900px) {
+  .bottom-nav { display: block; padding: 6px; bottom: calc(10px + env(safe-area-inset-bottom)); }
+  .bn-scroll { display: flex; flex-wrap: nowrap; gap: 4px; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; overscroll-behavior-x: contain; scrollbar-width: none; border-radius: 24px; }
+  .bn-scroll::-webkit-scrollbar { display: none; }
+  .bn-item { flex: 0 0 auto; min-width: 74px; padding: 0 10px; }
+  .bn-item span:last-child { white-space: nowrap; overflow: visible; text-overflow: clip; max-width: none; }
+  /* content never hides behind the bar */
+  .content { padding-bottom: calc(118px + env(safe-area-inset-bottom)); }
+  .toasts { bottom: calc(100px + env(safe-area-inset-bottom)); }
+  /* notch / status bar */
+  .header { padding-top: env(safe-area-inset-top); height: calc(76px + env(safe-area-inset-top)); }
+  .sidebar { padding-top: calc(26px + env(safe-area-inset-top)); }
+}
+@media (max-width: 380px) { .bn-item { min-width: 66px; padding: 0 8px; } }
+
+/* grids never demand more width than the screen has */
+.unit-grid { grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); }
+.unit-stock-grid { grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr)); }
+.unit-dist { grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); }
+.svc-pick, .unit-pick { grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr)); }
+.queue-row { grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr)); }
+/* rows that must wrap instead of overflowing */
+.ann-top { flex-wrap: wrap; row-gap: 6px; }
+.card-head, .btn-row, .toolbar-action, .page-head { min-width: 0; }
+.grow, .unit-main, .svc-name, .req > .grow { min-width: 0; overflow-wrap: anywhere; }
+
+/* tab bars: one line, swipe on small screens */
+@media (max-width: 640px) {
+  .tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; max-width: 100%; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tabs button { flex: 0 0 auto; white-space: nowrap; }
+  .btn-row.end > .btn, .btn-row.end > label.btn { width: 100%; white-space: normal; text-align: center; height: auto; min-height: 44px; padding: 10px 16px; }
+}
+
+/* very small phones (≤360px) */
+@media (max-width: 360px) {
+  .auth-page { padding: 64px 10px 30px; }
+  .auth-form { padding: 26px 16px; }
+  .auth-form h1 { font-size: 27px; }
+  .seg button { font-size: 13px; gap: 4px; }
+  .content { padding-left: 12px; padding-right: 12px; }
+  .card { padding: 16px; }
+  .unit-pillrow { padding-right: 0; min-height: 0; margin-bottom: 4px; }
+  .unit-nums { position: static; width: 100%; margin-top: 10px; }
+  .unit-nums > div { flex: 1; flex-direction: row; gap: 6px; }
+  .unit { flex-wrap: wrap; }
+  .stats .stat { padding: 18px; gap: 16px; }
+  .rtitle, .page-head h1 { font-size: 28px; }
+}
+
+/* landing navigation on tablets */
+@media (max-width: 1100px) and (min-width: 761px) {
+  .lp-nav { padding: 22px 28px; }
+  .lp-nav nav { gap: 20px; }
+  .lp-nav nav > button:not(.lp-btn) { font-size: 17px; }
+  .lp-nav .lp-btn { height: 50px; font-size: 17px; padding: 0 20px; }
+  .lp-brand .brand-wm small { display: none; }
+  .lp-nav .brand-logo { --bl: 48px !important; }
+  .lp-nav .brand-logo svg { width: 48px; height: 48px; }
+}
+@media (max-width: 360px) {
+  .lp-nav { padding: 14px 12px; gap: 8px; }
+  .lp-nav .brand-logo { --bl: 34px !important; }
+  .lp-nav .brand-logo svg { width: 34px; height: 34px; }
+  .lp-nav .lp-btn { font-size: 13px; padding: 0 12px; height: 38px; }
+  .lp-hero h1 { font-size: 46px; }
+}
+@media (max-width: 640px) { .filters-inline .select-wrap select, .toolbar .select-wrap select { width: 100%; min-width: 0; } }

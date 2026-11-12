@@ -146,7 +146,8 @@ function Router() {
 function StaffApp({ session, route, go, onLogout, onSession }: { session: Session; route: string; go: (r: string) => void; onLogout: () => void; onSession: (s: Session) => void }) {
   const { data } = useStore()
   const nav = STAFF_NAV.filter((n) => can(session, n.perm))
-  const bottom = STAFF_BOTTOM_ORDER.map((id) => nav.find((n) => n.id === id)).filter(Boolean).slice(0, 4) as NavItem[]
+  // Mobile bar: every page the role can open, most used first (scrolls horizontally).
+  const bottom = [...(STAFF_BOTTOM_ORDER.map((id) => nav.find((n) => n.id === id)).filter(Boolean) as NavItem[]), ...nav.filter((n) => !STAFF_BOTTOM_ORDER.includes(n.id)), SETTINGS]
 
   const notices = useMemo<Notice[]>(() => {
     const n: Notice[] = []
@@ -229,7 +230,7 @@ function ResidentApp({ session, route, go, onLogout }: { session: Session; route
     'ask-smile': <AskSmile />,
     'my-help': <RHelp />,
   }
-  const bottom = RESIDENT_BOTTOM.map((id) => RESIDENT_NAV.find((n) => n.id === id)!)
+  const bottom = [...RESIDENT_BOTTOM.map((id) => RESIDENT_NAV.find((n) => n.id === id)!), ...RESIDENT_NAV.filter((n) => !RESIDENT_BOTTOM.includes(n.id)), { id: 'my-help', label: 'Need help?', short: 'Help', icon: 'help' as const }]
   return (
     <ResidentContext.Provider value={{ session, resident, go, read, markRead }}>
       <Layout

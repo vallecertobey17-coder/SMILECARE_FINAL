@@ -1,4 +1,4 @@
-import { isValidElement, useState, type ReactElement, type ReactNode } from 'react'
+import { isValidElement, useEffect, useRef, useState, type ReactElement, type ReactNode } from 'react'
 import { Menu, X } from 'lucide-react'
 import { Icon, BellIcon, type IconName } from './Icon'
 import { useStore } from '../lib/store'
@@ -61,6 +61,13 @@ export function Layout({
   const [drawer, setDrawer] = useState(false)
   const [bellOpen, setBellOpen] = useState(false)
   const [help, setHelp] = useState(false)
+  const bnRef = useRef<HTMLDivElement>(null)
+  // keep the active item visible in the horizontally scrolling mobile bar
+  useEffect(() => {
+    const box = bnRef.current
+    const el = box?.querySelector<HTMLElement>('.bn-item.active')
+    if (box && el) box.scrollTo({ left: el.offsetLeft - (box.clientWidth - el.clientWidth) / 2, behavior: 'smooth' })
+  }, [route])
   const unread = notices.filter((n) => n.unread !== false).length
 
   const navTo = (id: string) => {
@@ -192,18 +199,14 @@ export function Layout({
       </div>
 
       <nav className="bottom-nav" aria-label="Main">
-        {bottom.map(({ id, label, short, icon }) => (
-          <button key={id} className={`bn-item ${route === id ? 'active' : ''}`} onClick={() => navTo(id)} aria-current={route === id ? 'page' : undefined}>
-            <span className="bn-ic">{renderIcon(icon)}</span>
-            <span>{short ?? label}</span>
-          </button>
-        ))}
-        <button className={`bn-item ${drawer || !bottom.some((b) => b.id === route) ? 'active' : ''}`} onClick={() => setDrawer((v) => !v)} aria-expanded={drawer} aria-label="More pages">
-          <span className="bn-ic">
-            <Menu size={24} strokeWidth={1.6} />
-          </span>
-          <span>More</span>
-        </button>
+        <div className="bn-scroll" ref={bnRef}>
+          {bottom.map(({ id, label, short, icon }) => (
+            <button key={id} className={`bn-item ${route === id ? 'active' : ''}`} onClick={() => navTo(id)} aria-current={route === id ? 'page' : undefined}>
+              <span className="bn-ic">{renderIcon(icon)}</span>
+              <span>{short ?? label}</span>
+            </button>
+          ))}
+        </div>
       </nav>
 
       <Modal open={help} title="IT Support" subtitle={`${PROJECT.name} • Municipality of Taytay`} onClose={() => setHelp(false)}>
