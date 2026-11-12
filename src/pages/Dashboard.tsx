@@ -138,13 +138,13 @@ export default function Dashboard({ go: rawGo, session }: { go: (r: string) => v
                   </small>
                 </div>
                 <div className="unit-nums">
-                  <div>
+                  <div className="num-served">
                     <b>{u.served}</b>
                     <small>Served</small>
                   </div>
-                  <div>
+                  <div className="num-queue">
                     <b>{u.queue}</b>
-                    <small>In queue</small>
+                    <small>In Queue</small>
                   </div>
                 </div>
               </div>

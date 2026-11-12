@@ -1054,3 +1054,28 @@ blockquote cite { display: block; margin-top: 10px; font-style: normal; font-wei
   .svc-count b { font-size: 20px; }
   .svc-bar { margin-left: -60px; height: 12px; }
 }
+
+/* Notification bell: smaller and centred with the avatar */
+.header-right { gap: 14px; }
+.bell-wrap { display: flex; align-items: center; }
+.bell { display: grid; place-items: center; width: 46px; height: 46px; }
+.bell-img { width: 46px; height: 46px; }
+.bell-count { top: -3px; right: -3px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; font-size: 11.5px; line-height: 1; border-width: 2px; }
+.profile .avatar { width: 46px; height: 46px; font-size: 16px; }
+@media (max-width: 900px) { .bell, .bell-img { width: 40px; height: 40px; } .profile .avatar { width: 40px; height: 40px; font-size: 15px; } }
+
+/* Today's operations: Served / In Queue tiles */
+.unit-nums { gap: 12px; }
+.unit-nums > div { min-width: 92px; padding: 10px 12px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.unit-nums b { font-size: 28px; font-weight: 700; line-height: 1.1; }
+.unit-nums small { font-size: 14px; color: #1e1e1e; }
+.num-served { background: #fff; border: 1px solid #2f7fb0; }
+.num-served b { color: var(--brand); }
+.num-queue { background: #fdf8e1; border: 1px solid #efdb00; }
+.num-queue b { color: #a1490b; }
+@media (max-width: 640px) {
+  .unit { flex-wrap: wrap; }
+  .unit-nums { width: 100%; }
+  .unit-nums > div { flex: 1; flex-direction: row; gap: 8px; padding: 10px; }
+  .unit-nums b { font-size: 24px; }
+}
