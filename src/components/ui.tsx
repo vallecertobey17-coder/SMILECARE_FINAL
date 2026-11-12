@@ -178,6 +178,7 @@ const toneFor: Record<string, string> = {
   'OUT OF STOCK': 'red',
   EXPIRED: 'red',
   ERROR: 'red',
+  'NOT ELIGIBLE': 'red',
   CLOSED: 'gray',
   ACTIVE: 'green',
   INACTIVE: 'gray',
@@ -249,6 +250,7 @@ export function Toolbar({
   filterCount,
   action,
   allLabel = 'All Statuses',
+  labels,
 }: {
   search: string
   onSearch: (v: string) => void
@@ -261,6 +263,7 @@ export function Toolbar({
   filterCount?: number
   action?: ReactNode
   allLabel?: string
+  labels?: Record<string, string>
 }) {
   return (
     <div className="toolbar">
@@ -278,7 +281,7 @@ export function Toolbar({
           <option value="">{allLabel}</option>
           {statuses.map((s) => (
             <option key={s} value={s}>
-              {s === s.toUpperCase() ? s.charAt(0) + s.slice(1).toLowerCase() : s}
+              {labels?.[s] ?? (s === s.toUpperCase() ? s.charAt(0) + s.slice(1).toLowerCase() : s)}
             </option>
           ))}
         </select>

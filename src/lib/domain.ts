@@ -99,7 +99,7 @@ export function residentHistory(data: Data, r: Pick<Resident, 'id' | 'name'>): H
       title: d.items.map((i) => i.label).join(', '),
       detail: d.items.map((i) => { const u = data.medicines.find((m) => m.id === i.medicineId)?.unit ?? 'units'; return `${i.qty} ${i.qty === 1 ? u.replace(/s$/, '') : u}` }).join(', '),
       where: sourceName(data, d.source),
-      status: d.status,
+      status: dispenseLabel(d.status, d.note),
     })
   for (const v of data.vaccinations.filter(mine))
     out.push({ id: v.id, kind: 'vaccination', date: v.date, title: `${v.vaccine} vaccine`, detail: v.dose, where: `${v.administeredBy} • ${v.location}` })
@@ -214,4 +214,18 @@ export function recommendDeployments(data: Data, barangays: string[]): Recommend
       return { barangay: s.barangay, score: Math.round(score), reasons: reasons.length ? reasons : ['Routine coverage'], services, medicines }
     })
     .sort((a, b) => b.score - a.score)
+}
+
+/** Label shown instead of "ERROR" for a dispensing that could not be released. */
+export function dispenseLabel(status: string, note?: string): string {
+  if (status !== 'ERROR') return status
+  const n = (note ?? '').toLowerCase()
+  if (n.includes('expired')) return 'EXPIRED'
+  if (n.includes('verification') || n.includes('not registered') || n.includes('rejected')) return 'NOT ELIGIBLE'
+  return 'OUT OF STOCK'
+}
+/** Extra detail worth showing under the label (hidden when it only repeats it). */
+export function dispenseNote(note?: string): string {
+  if (!note) return ''
+  return /^out of stock\.?$/i.test(note.trim()) ? '' : note
 }

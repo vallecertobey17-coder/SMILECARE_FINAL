@@ -129,7 +129,7 @@ export default function RHistory() {
                 {h.detail && <small>{h.detail}</small>}
                 <small className="muted">{h.where}</small>
               </span>
-              {h.status && <span className={`pill ${h.status === 'COMPLETED' ? 'pill-ok' : h.status === 'PENDING' ? 'pill-wait' : 'pill-no'}`}>{h.status === 'COMPLETED' ? 'Released' : h.status.charAt(0) + h.status.slice(1).toLowerCase()}</span>}
+              {h.status && <span className={`pill ${h.status === 'COMPLETED' ? 'pill-ok' : h.status === 'PENDING' ? 'pill-wait' : 'pill-no'}`}>{h.status === 'COMPLETED' ? 'Released' : h.status === 'PENDING' ? 'Pending' : h.status.charAt(0) + h.status.slice(1).toLowerCase()}</span>}
             </div>
           ))}
         </div>

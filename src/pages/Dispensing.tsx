@@ -6,7 +6,7 @@ import type { Session } from '../lib/auth'
 import { Icon } from '../components/Icon'
 import { Badge, RowMenu, Confirm, Empty, Field, Modal, PageHead, Pager, StatCard, Toolbar, usePaged, useToast } from '../components/ui'
 import { fmtDate, fmtNum, isoDate } from '../lib/utils'
-import { checkEligibility, medLabel, sourceName, stockAt, stockPatches } from '../lib/domain'
+import { checkEligibility, dispenseLabel, dispenseNote, medLabel, sourceName, stockAt, stockPatches } from '../lib/domain'
 
 const STATUSES: DispenseStatus[] = ['COMPLETED', 'PENDING', 'ERROR']
 
@@ -149,7 +149,7 @@ export default function Dispensing({ session }: { session: Session }) {
       <div className="stats stats-3">
         <StatCard icon={<ClipboardCheck size={24} />} label="Completed" value={data.dispensings.filter((d) => d.status === 'COMPLETED').length} note={`${data.dispensings.filter((d) => d.status === 'COMPLETED' && d.date.startsWith(isoDate())).length} today`} onClick={() => setStatus('COMPLETED')} active={status === 'COMPLETED'} />
         <StatCard icon={<Hourglass size={24} />} label="Pending" value={data.dispensings.filter((d) => d.status === 'PENDING').length + requests.length} note={`${requests.length} resident request${requests.length === 1 ? '' : 's'}`} onClick={() => setStatus('PENDING')} active={status === 'PENDING'} />
-        <StatCard icon={<AlertOctagon size={24} />} label="Errors" value={data.dispensings.filter((d) => d.status === 'ERROR').length} note="Needs follow-up" onClick={() => setStatus('ERROR')} active={status === 'ERROR'} />
+        <StatCard icon={<AlertOctagon size={24} />} label="Out of stock" value={data.dispensings.filter((d) => d.status === 'ERROR').length} note="Needs restock" onClick={() => setStatus('ERROR')} active={status === 'ERROR'} />
       </div>
 
       {requests.length > 0 && (
@@ -182,7 +182,7 @@ export default function Dispensing({ session }: { session: Session }) {
         </section>
       )}
 
-      <Toolbar search={q} onSearch={setQ} placeholder="Search Dispensing..." status={status} onStatus={setStatus} statuses={STATUSES}
+      <Toolbar search={q} onSearch={setQ} placeholder="Search Dispensing..." status={status} onStatus={setStatus} statuses={STATUSES} labels={{ ERROR: 'Out of stock / not released' }}
         filtersOpen={showFilters} onToggleFilters={() => setShowFilters((v) => !v)} filterCount={[day, src].filter(Boolean).length}
         action={!readOnly && verifier && <button className="btn btn-primary" onClick={() => openNew()}><Icon name="add" /> Dispense Medicine</button>} />
       {showFilters && (
@@ -210,7 +210,7 @@ export default function Dispensing({ session }: { session: Session }) {
                     <td><b>{d.residentName}</b>{d.verifiedBy && <div className="muted small">Verified by {d.verifiedBy}</div>}</td>
                     <td>{d.items.map((i, k) => <div key={k}>{i.label}</div>)}</td>
                     <td>{d.items.map((i, k) => <div key={k}>{i.qty} {unit(i)}</div>)}</td>
-                    <td><Badge status={d.status} />{d.status === 'ERROR' && d.note && <div className="muted small err-note">{d.note}</div>}</td>
+                    <td><Badge status={dispenseLabel(d.status, d.note)} />{d.status === 'ERROR' && dispenseNote(d.note) && <div className="muted small err-note">{dispenseNote(d.note)}</div>}</td>
                     <td className="right">
                       <RowMenu label={`Actions for ${d.ref}`} items={[
                         { label: 'View details', onClick: () => setViewing(d) },
@@ -288,11 +288,11 @@ export default function Dispensing({ session }: { session: Session }) {
         footer={viewing && !readOnly && viewing.status !== 'COMPLETED' && <button className="btn btn-primary" onClick={() => complete(viewing)}>Verify & release</button>}>
         {viewing && (
           <div className="stack">
-            <div className="info-row"><span className="muted">Status</span><Badge status={viewing.status} /></div>
+            <div className="info-row"><span className="muted">Status</span><Badge status={dispenseLabel(viewing.status, viewing.note)} /></div>
             <div className="info-row"><span className="muted">Source</span><b>{sourceName(data, viewing.source)}</b></div>
             {viewing.verifiedBy && <div className="info-row"><span className="muted">Verified by</span><b>{viewing.verifiedBy}</b></div>}
             {viewing.items.map((i, k) => <div key={k} className="info-row"><span>{i.label}</span><b>× {i.qty}</b></div>)}
-            {viewing.note && <div className="alert alert-err">{viewing.note}</div>}
+            {dispenseNote(viewing.note) && <div className="alert alert-err">{dispenseNote(viewing.note)}</div>}
           </div>
         )}
       </Modal>
