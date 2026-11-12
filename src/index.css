@@ -1220,3 +1220,8 @@ blockquote cite { display: block; margin-top: 10px; font-style: normal; font-wei
   .lp-hero h1 { font-size: 46px; }
 }
 @media (max-width: 640px) { .filters-inline .select-wrap select, .toolbar .select-wrap select { width: 100%; min-width: 0; } }
+
+/* Dashboard quick actions: one line, swipe/scroll horizontally */
+.quick-row { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; overscroll-behavior-x: contain; padding: 2px 2px 4px; max-width: 100%; }
+.quick-row::-webkit-scrollbar { display: none; }
+.quick-row .chip { flex: 0 0 auto; white-space: nowrap; }
