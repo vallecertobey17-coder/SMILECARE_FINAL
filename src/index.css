@@ -1399,3 +1399,66 @@ blockquote cite { display: block; margin-top: 10px; font-style: normal; font-wei
 .ficon.ic-sm { transform: scale(.82); }
 @media (prefers-reduced-motion: reduce) { .splash-mark, .splash-wm, .splash-tag, .splash-bar, .splash-bar span { animation-duration: .01s !important; animation-iteration-count: 1 !important; } }
 .reset-code { font-size: 20px; letter-spacing: .2em; margin-left: 6px; }
+
+/* ---------- E-Pila (staff) ---------- */
+.now-serving { margin-top: 14px; padding: 14px 16px; border-radius: 14px; background: linear-gradient(135deg, #e3f2fd, #f2f9ff); border: 1px solid var(--brand-line); }
+.now-serving.empty { background: #f6f9fc; }
+.now-serving .eyebrow { display: block; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--brand); margin-bottom: 6px; }
+.ns-row { display: flex; align-items: center; gap: 12px; }
+.ns-row .grow b, .ns-row .grow small { display: block; }
+.ns-num { font-size: 34px; line-height: 1; font-weight: 800; color: var(--brand); letter-spacing: -.02em; }
+.ns-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.ns-actions .btn { flex: 1 1 auto; justify-content: center; }
+.btn.danger { color: var(--red-ink); border-color: #f2c3c3; }
+.prio { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 999px; background: #fff4d6; color: #8a5a00; font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+.next-up { margin-top: 12px; }
+.next-up ol { list-style: none; padding: 0; margin: 6px 0 4px; display: flex; flex-direction: column; gap: 6px; }
+.next-up li { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 10px; background: #f6f9fc; font-size: 14px; }
+.next-up li.is-prio { background: #fffaf0; }
+.next-up li b { min-width: 38px; color: var(--brand); }
+.next-up .lane { color: #586776; font-size: 12px; }
+.cutoff { display: flex; align-items: center; gap: 6px; margin: 10px 0 0; font-size: 13px; color: #8a5a00; }
+.issue-num { font-size: 28px; color: var(--brand); }
+.unit-actions { flex-wrap: wrap; }
+
+/* ---------- E-Pila public display board ---------- */
+.board { min-height: 100vh; background: radial-gradient(circle at 20% 0%, #0b6aa8, #063a5e 70%); color: #fff; padding: 28px 36px; display: flex; flex-direction: column; gap: 24px; }
+.board-head { display: flex; align-items: center; gap: 24px; }
+.board-title { flex: 1; display: flex; flex-direction: column; }
+.board-title b { font-size: 30px; }
+.board-title small, .board-clock small { opacity: .8; font-size: 16px; }
+.board-clock { text-align: right; display: flex; flex-direction: column; }
+.board-clock b { font-size: 34px; }
+.board-grid { display: grid; gap: 22px; grid-template-columns: repeat(3, 1fr); flex: 1; }
+.board-grid.n1 { grid-template-columns: 1fr; } .board-grid.n2 { grid-template-columns: repeat(2, 1fr); }
+.board-card { background: rgba(255, 255, 255, .1); border: 1px solid rgba(255, 255, 255, .25); border-radius: 24px; padding: 24px 28px; display: flex; flex-direction: column; gap: 6px; }
+.bc-head b { display: block; font-size: 24px; } .bc-head small { opacity: .8; }
+.bc-label { margin-top: 14px; font-size: 14px; letter-spacing: .12em; text-transform: uppercase; opacity: .8; font-weight: 700; }
+.bc-num { font-size: clamp(72px, 9vw, 140px); line-height: 1; font-weight: 800; letter-spacing: -.03em; color: #fff; }
+.bc-lane { font-size: 18px; opacity: .9; }
+.bc-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+.bc-chips span { display: inline-flex; align-items: center; gap: 4px; padding: 8px 14px; border-radius: 12px; background: rgba(255, 255, 255, .16); font-size: 24px; font-weight: 700; }
+.bc-chips .prio-chip { background: #ffd770; color: #3d2a00; }
+.bc-foot { margin-top: auto; padding-top: 14px; display: flex; justify-content: space-between; font-size: 16px; opacity: .85; }
+.board-foot { text-align: center; font-size: 18px; opacity: .85; }
+.board-empty { font-size: 22px; text-align: center; opacity: .85; margin-top: 60px; }
+@media (max-width: 900px) { .board { padding: 18px; } .board-grid, .board-grid.n2 { grid-template-columns: 1fr; } .board-head { flex-wrap: wrap; } .board-clock { text-align: left; } }
+.ticket-prio { display: inline-block; margin-top: 6px; padding: 4px 10px; border-radius: 999px; background: #ffd770; color: #3d2a00; font-size: 12.5px; font-weight: 700; }
+
+/* ---------- Floating Ask SMILE bubble (resident portal) ---------- */
+.ask-fab { position: fixed; right: 24px; bottom: 24px; z-index: 42; display: inline-flex; align-items: center; gap: 10px; height: 60px; padding: 0 22px 0 16px; border: 0; border-radius: 999px; background: linear-gradient(135deg, #006398, #2a9fd8); color: #fff; font-weight: 700; font-size: 16px; box-shadow: 0 12px 28px rgba(0, 70, 120, .35); cursor: pointer; animation: ask-in .5s 1.8s both; }
+.ask-fab:hover { transform: translateY(-2px); box-shadow: 0 16px 32px rgba(0, 70, 120, .4); }
+.ask-fab.on { background: #004a73; }
+.ask-fab::after { content: ''; position: absolute; top: 8px; left: 40px; width: 12px; height: 12px; border-radius: 50%; background: #34c77b; border: 2px solid #fff; }
+@keyframes ask-in { from { opacity: 0; transform: translateY(16px) scale(.9) } to { opacity: 1; transform: none } }
+.ask-pop-wrap { position: fixed; right: 24px; bottom: 96px; z-index: 42; width: min(400px, calc(100vw - 24px)); animation: pop .15s; }
+.ask-pop { box-shadow: 0 20px 50px rgba(0, 50, 90, .3); background: #fff; }
+.ask-pop .chat-body { min-height: 220px; max-height: min(46vh, 380px); }
+.ask-pop .chat-head .link { white-space: nowrap; }
+@media (max-width: 900px) {
+  .ask-fab { right: 14px; bottom: calc(96px + env(safe-area-inset-bottom)); width: 56px; height: 56px; padding: 0; justify-content: center; }
+  .ask-fab-label { display: none; }
+  .ask-fab::after { left: auto; right: 4px; top: 4px; }
+  .ask-pop-wrap { right: 12px; left: 12px; width: auto; bottom: calc(162px + env(safe-area-inset-bottom)); }
+  .ask-pop .chat-body { max-height: 34vh; }
+}

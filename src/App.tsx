@@ -66,6 +66,9 @@ const STAFF_ROUTES = new Set([...STAFF_NAV.map((n) => n.id), 'preferences'])
 const readHash = () => window.location.hash.replace(/^#/, '')
 
 import { Splash } from './components/Splash'
+import Display from './pages/Display'
+import { AskBubble } from './pages/resident/AskBubble'
+import { positionOf } from './lib/epila'
 
 export default function App() {
   return (
@@ -128,7 +131,7 @@ function Router() {
 
   // Route guards
   useEffect(() => {
-    if (!session) return
+    if (!session || route.startsWith('display')) return
     if (session.kind === 'resident' && !RESIDENT_ROUTES.has(route)) go('my-home')
     if (session.kind === 'staff') {
       const allowed = STAFF_NAV.find((n) => n.id === route)
@@ -137,6 +140,7 @@ function Router() {
     }
   }, [session, route, go])
 
+  if (route.startsWith('display')) return <Display />
   if (!session) {
     if (route === 'login' || route === 'staff-login' || STAFF_ROUTES.has(route) || RESIDENT_ROUTES.has(route))
       return <Login key={route} initialKind={route === 'staff-login' || STAFF_ROUTES.has(route) ? 'staff' : 'resident'} onBack={() => go('home')} onLogin={(s) => { setStored(s); go(s.kind === 'staff' ? 'dashboard' : 'my-home') }} />
@@ -208,7 +212,7 @@ function ResidentApp({ session, route, go, onLogout }: { session: Session; route
     for (const a of data.appointments.filter((x) => x.residentId === resident.id && x.status === 'CONFIRMED' && x.date >= today && x.date <= soon))
       n.push({ key: a.id, icon: <CalendarClock size={18} />, title: `Upcoming: ${a.serviceName ?? 'Medicine pickup'}`, text: `${fmtDate(a.date)} • ${a.location}`, to: 'my-booking' })
     for (const t of data.tickets.filter((x) => x.residentId === resident.id && (x.status === 'WAITING' || x.status === 'SERVING')))
-      n.push({ key: t.id, icon: <TicketIcon size={18} />, title: t.status === 'SERVING' ? `It's your turn! #${t.number}` : `E-Pila #${t.number}`, text: t.unitName, to: 'my-booking' })
+      { const { ahead } = positionOf(data, t); n.push({ key: t.id + (t.status === 'SERVING' ? 's' : ahead <= 3 ? 'n' : ''), icon: <TicketIcon size={18} />, title: t.status === 'SERVING' ? `It's your turn! #${t.number}` : ahead <= 3 ? `Almost your turn — #${t.number}` : `E-Pila #${t.number}`, text: t.status === 'SERVING' ? `Please proceed to the counter • ${t.unitName}` : `${ahead} ahead of you • ${t.unitName}`, to: 'my-booking' }) }
     for (const a of [...data.announcements].sort((x, y) => y.date.localeCompare(x.date)).slice(0, 8))
       n.push({ key: a.id, icon: <Megaphone size={18} />, title: a.title, text: a.category.charAt(0) + a.category.slice(1).toLowerCase(), to: 'my-announcements', unread: !read.has(a.id) })
     return n
@@ -251,6 +255,7 @@ function ResidentApp({ session, route, go, onLogout }: { session: Session; route
         onProfile={() => go('my-profile')}
       >
         {pages[route] ?? pages['my-home']}
+        <AskBubble route={route} go={go} />
       </Layout>
     </ResidentContext.Provider>
   )

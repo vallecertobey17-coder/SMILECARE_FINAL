@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { Send, Square, AlertTriangle } from 'lucide-react'
+import { Send, Square, AlertTriangle, X } from 'lucide-react'
 import { getCapability, useStore } from '../../lib/store'
 import { useResident } from './context'
 import { fmtDate, fmtTime, isoDate, medicineStatus } from '../../lib/utils'
@@ -9,7 +9,7 @@ type Msg = { role: 'user' | 'assistant'; content: string }
 const CHIPS = ['Rolling Botika schedule', 'Refill my medicine', 'Book a consultation', 'What is Losartan for?']
 const EMERGENCY = /(chest pain|can't breathe|cannot breathe|difficulty breathing|unconscious|seizure|stroke|heavy bleeding|suicid|overdose|nalason|hindi makahinga)/i
 
-export default function AskSmile() {
+export default function AskSmile({ compact, onClose, onOpenPage }: { compact?: boolean; onClose?: () => void; onOpenPage?: () => void } = {}) {
   const { data } = useStore()
   const { resident } = useResident()
   const first = resident.name.split(' ')[0]
@@ -136,24 +136,16 @@ ${context()}`
     ask(input)
   }
 
-  return (
-    <div className="page rpage ask-page">
-      <div className="page-head">
-        <div>
-          <h1 className="rtitle">Ask SMILE</h1>
-          <p>Simple health guidance, available anytime.</p>
-        </div>
-        <span className="pill pill-no lg ask-warn">
-          <AlertTriangle size={14} /> NOT FOR EMERGENCIES
-        </span>
-      </div>
-      <section className="chat card ask-chat">
+  const chat = (
+      <section className={`chat card ask-chat ${compact ? 'ask-pop' : ''}`} role={compact ? 'dialog' : undefined} aria-label={compact ? 'Ask SMILE' : undefined}>
         <div className="chat-head">
           <span className="avatar">SC</span>
-          <span>
+          <span className="grow">
             <b>SMILE Health Assistant</b>
             <small className="muted online"><i className="online-dot" />{ai ? 'Online now • AI powered' : 'Online now'}</small>
           </span>
+          {compact && onOpenPage && <button type="button" className="link small" onClick={onOpenPage}>Open full page</button>}
+          {compact && onClose && <button type="button" className="icon-btn" onClick={onClose} aria-label="Close Ask SMILE"><X size={20} /></button>}
         </div>
         <div className="chat-body" aria-live="polite">
           {msgs.map((m, i) => (
@@ -174,7 +166,7 @@ ${context()}`
           </div>
         </div>
         <form className="chat-input" onSubmit={submit}>
-          <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type your health question…" aria-label="Type your health question" />
+          <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type your health question…" aria-label="Type your health question" autoFocus={compact} />
           {busy && ai ? (
             <button type="button" className="send-btn stop" onClick={() => ctl.current?.abort()} aria-label="Stop">
               <Square size={16} />
@@ -187,6 +179,20 @@ ${context()}`
         </form>
         <p className="chat-note">For emergencies, call 911 or go to the nearest hospital. SMILE does not diagnose or prescribe.</p>
       </section>
+  )
+  if (compact) return chat
+  return (
+    <div className="page rpage ask-page">
+      <div className="page-head">
+        <div>
+          <h1 className="rtitle">Ask SMILE</h1>
+          <p>Simple health guidance, available anytime.</p>
+        </div>
+        <span className="pill pill-no lg ask-warn">
+          <AlertTriangle size={14} /> NOT FOR EMERGENCIES
+        </span>
+      </div>
+      {chat}
     </div>
   )
 }

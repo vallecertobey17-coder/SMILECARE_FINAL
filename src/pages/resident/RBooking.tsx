@@ -5,9 +5,10 @@ import { useResident } from './context'
 import { Icon } from '../../components/Icon'
 import { Confirm, Empty, useToast } from '../../components/ui'
 import { fmtDate, fmtTime, isoDate, medicineStatus } from '../../lib/utils'
-import { medLabel, nextTicketNumber, nowServing } from '../../lib/domain'
+import { medLabel } from '../../lib/domain'
+import { CUTOFF_MIN, PRIORITIES, cutoffReached, nextNumber, positionOf, serviceOf, servingTicket, waitingList } from '../../lib/epila'
 import { VerificationBanner } from './shared'
-import type { Appointment, Service, Ticket } from '../../lib/types'
+import type { Appointment, PriorityType, Service, Ticket } from '../../lib/types'
 import { PROGRAMS } from '../../lib/types'
 
 type Step = 'choose' | 'details' | 'done'
@@ -395,7 +396,9 @@ function EPila() {
   const [unitId, setUnitId] = useState('')
   const [purpose, setPurpose] = useState<string>(PROGRAMS[0])
   const [busy, setBusy] = useState(false)
+  const [priority, setPriority] = useState<'' | PriorityType>('')
   const active = data.units.filter((u) => u.status !== 'CLOSED')
+  const nowServing = (_d: unknown, unitId: string) => servingTicket(data, unitId)?.number ?? 0
   const myTickets = data.tickets.filter((t) => t.residentId === resident.id).sort((a, b) => b.createdAt.localeCompare(a.createdAt))
   const current = myTickets.filter((t) => t.status === 'WAITING' || t.status === 'SERVING')
   const past = myTickets.filter((t) => t.status === 'DONE' || t.status === 'CANCELLED').slice(0, 6)
@@ -403,12 +406,13 @@ function EPila() {
   async function join() {
     const unit = data.units.find((u) => u.id === unitId)
     if (!unit) return toast('Choose a location first', 'err')
-    if (current.some((t) => t.unitId === unit.id)) return toast('You already have a number at this location', 'err')
+    if (current.length) return toast(`You already have number #${current[0].number} at ${current[0].unitName}. Leave that queue first.`, 'err')
+    if (cutoffReached(unit)) return toast(`${unit.name} stopped issuing numbers ${CUTOFF_MIN} minutes before closing.`, 'err')
     setBusy(true)
     try {
-      const number = nextTicketNumber(data, unit)
-      await add('tickets', { unitId: unit.id, unitName: unit.name, number, residentId: resident.id, residentName: resident.name, purpose, status: 'WAITING', createdAt: new Date().toISOString() })
-      await update('units', unit.id, { queue: unit.queue + 1 }, { silent: true })
+      const number = nextNumber(data, unit)
+      await add('tickets', { unitId: unit.id, unitName: unit.name, number, residentId: resident.id, residentName: resident.name, purpose, service: serviceOf({ purpose }), status: 'WAITING', ...(priority ? { priority } : {}), createdAt: new Date().toISOString() })
+      await update('units', unit.id, { queue: waitingList(data, unit.id).length + 1 }, { silent: true })
       toast(`You're #${number} at ${unit.name}`)
     } catch (e: any) {
       toast(e.message, 'err')
@@ -420,7 +424,7 @@ function EPila() {
     try {
       await update('tickets', t.id, { status: 'CANCELLED' })
       const u = data.units.find((x) => x.id === t.unitId)
-      if (u && t.status === 'WAITING' && u.queue > 0) await update('units', u.id, { queue: u.queue - 1 }, { silent: true })
+      if (u && t.status === 'WAITING') await update('units', u.id, { queue: Math.max(0, waitingList(data, u.id).length - 1) }, { silent: true })
       toast('You left the queue')
     } catch (e: any) {
       toast(e.message, 'err')
@@ -432,12 +436,13 @@ function EPila() {
       <div className="stack">
         {current.map((t) => {
           const serving = nowServing(data, t.unitId)
-          const ahead = Math.max(0, t.number - serving - 1)
+          const { ahead, minutes } = positionOf(data, t)
           return (
             <section key={t.id} className={`ticket ${t.status === 'SERVING' ? 'serving' : ''}`}>
               <span className="eyebrow light">E-Pila number</span>
               <b className="ticket-num">#{t.number}</b>
-              <span className="ticket-unit">{t.unitName}</span>
+              <span className="ticket-unit">{t.unitName} • {serviceOf(t)}</span>
+              {t.priority && <span className="ticket-prio">★ Priority lane • {t.priority} — show a valid ID at the counter</span>}
               <div className="ticket-stats">
                 <div>
                   <b>#{serving || '—'}</b>
@@ -448,7 +453,7 @@ function EPila() {
                   <small>Ahead of you</small>
                 </div>
                 <div>
-                  <b>~{t.status === 'SERVING' ? 0 : ahead * 5} min</b>
+                  <b>~{minutes} min</b>
                   <small>Est. wait</small>
                 </div>
               </div>
@@ -476,8 +481,8 @@ function EPila() {
                 <small className="muted">
                   {u.location} • Until {fmtTime(u.until)}
                 </small>
-                <span className="pill pill-ok">
-                  Now serving #{nowServing(data, u.id) || '—'} • {u.queue} waiting
+                <span className={`pill ${cutoffReached(u) ? 'pill-wait' : 'pill-ok'}`}>
+                  {cutoffReached(u) ? `Not accepting new numbers (closes ${fmtTime(u.until)})` : `Now serving #${nowServing(data, u.id) || '—'} • ${waitingList(data, u.id).length} waiting`}
                 </span>
               </button>
             ))}
@@ -492,8 +497,16 @@ function EPila() {
                   ))}
                 </select>
               </label>
+              <label className="field">
+                <span className="field-label">Priority lane</span>
+                <select value={priority} onChange={(e) => setPriority(e.target.value as '' | PriorityType)}>
+                  <option value="">None</option>
+                  {PRIORITIES.map((p) => <option key={p}>{p}</option>)}
+                </select>
+                <small className="muted">Seniors, PWDs and pregnant women are served first. Bring a valid ID.</small>
+              </label>
               <div className="field end">
-                <button className="btn btn-primary" disabled={!verified || !unitId || busy} onClick={join}>
+                <button className="btn btn-primary" disabled={!verified || !unitId || busy || current.length > 0 || !!(data.units.find((u) => u.id === unitId) && cutoffReached(data.units.find((u) => u.id === unitId)!))} onClick={join}>
                   <TicketIcon size={18} /> Get my number
                 </button>
               </div>

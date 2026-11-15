@@ -138,7 +138,8 @@ export interface Appointment {
   notes?: string
 }
 
-export type TicketStatus = 'WAITING' | 'SERVING' | 'DONE' | 'CANCELLED'
+export type TicketStatus = 'WAITING' | 'SERVING' | 'DONE' | 'CANCELLED' | 'NO_SHOW'
+export type PriorityType = 'Senior citizen' | 'PWD' | 'Pregnant'
 export interface Ticket {
   id: string
   unitId: string
@@ -149,6 +150,13 @@ export interface Ticket {
   purpose: string
   status: TicketStatus
   createdAt: string
+  service?: string // queue lane: Consultation, Medicine pickup, Screening, Vaccination
+  priority?: PriorityType // RA 9994 / RA 10754 priority lane
+  order?: number // position key (defaults to number; moved back on a no-show)
+  calledAt?: string
+  doneAt?: string
+  noShows?: number
+  walkIn?: boolean
 }
 
 export interface Consultation {

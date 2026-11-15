@@ -15,6 +15,21 @@ const day = (d: number) => {
 }
 /** ISO datetime, `d` days from today at hh:mm local */
 const at = (d: number, hm = '09:00') => `${day(d)}T${hm}:00`
+
+/* Demo E-Pila lines: today's last few completed tickets, the one being served, and the waiting line. */
+const QNAMES = ['Rodel Bautista', 'Cristina Aquino', 'Mario Dizon', 'Jocelyn Ramos', 'Antonio Reyes', 'Liza Mercado', 'Ramon Garcia', 'Teresa Navarro', 'Benjamin Cruz', 'Gloria Fernandez', 'Ernesto Villanueva', 'Nida Castillo', 'Paolo Mendoza', 'Rowena Santiago', 'Danilo Torres', 'Marites Flores', 'Arnel de Leon', 'Susan Manalo', 'Jose Pascual', 'Evelyn Ocampo']
+function demoQueue(unitId: string, unitName: string, served: number, queue: number, lanes: string[], withServing: boolean) {
+  const out: any[] = []
+  const hm = (m: number) => { const t = 8 * 60 + m; return `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}` }
+  for (let i = 0; i < 6; i++) { const n = served - 5 + i; out.push({ id: `tkt-${unitId}-d${n}`, unitId, unitName, number: n, residentId: '', residentName: QNAMES[(n + 7) % QNAMES.length], purpose: lanes[i % lanes.length], service: lanes[i % lanes.length], status: 'DONE', walkIn: true, createdAt: at(0, hm(60 + i * 8)), calledAt: at(0, hm(110 + i * 7)), doneAt: at(0, hm(115 + i * 7)) }) }
+  let n = served + 1
+  if (withServing) { out.push({ id: `tkt-${unitId}-s${n}`, unitId, unitName, number: n, residentId: '', residentName: QNAMES[n % QNAMES.length], purpose: lanes[0], service: lanes[0], status: 'SERVING', walkIn: true, createdAt: at(0, hm(150)), calledAt: at(0, hm(175)) }); n++ } else n++
+  for (let i = 0; i < queue; i++, n++) {
+    const lane = lanes[(i + 1) % lanes.length]
+    out.push({ id: `tkt-${unitId}-w${n}`, unitId, unitName, number: n, residentId: '', residentName: QNAMES[(n * 3) % QNAMES.length], purpose: lane, service: lane, status: 'WAITING', walkIn: i % 3 !== 0, priority: i === 3 ? 'Senior citizen' : i === 8 ? 'PWD' : i === 13 ? 'Pregnant' : undefined, createdAt: at(0, hm(160 + i * 4)) })
+  }
+  return out
+}
 /** YYYY-MM, `m` months from this month */
 const month = (m: number) => {
   const x = new Date(now.getFullYear(), now.getMonth() + m, 1)
@@ -79,7 +94,10 @@ export const seed: Seed = {
     { id: 'apt-002', ref: 'APT-24002', residentId: 'res-004', residentName: 'Lorna Villanueva', barangay: 'Dolores', kind: 'both', serviceId: 'svc-005', serviceName: 'Eye Check-up', date: day(3), time: '8:00 - 8:30 AM', location: 'Dolores Covered Court', status: 'PENDING', medicines: [{ medicineId: 'med-losartan', label: 'Losartan (50mg)', qty: 30 }], createdAt: at(-1, '18:00') },
   ],
   tickets: [
-    { id: 'tkt-001', unitId: 'unit-sj', unitName: 'Rolling Botika • San Juan', number: 85, residentId: 'res-002', residentName: 'Maria Santos', purpose: 'Medicine Distribution', status: 'SERVING', createdAt: at(0, '08:40') },
+    { id: 'tkt-001', unitId: 'unit-sj', unitName: 'Rolling Botika • San Juan', number: 85, residentId: 'res-002', residentName: 'Maria Santos', purpose: 'Medicine Distribution', service: 'Medicine pickup', status: 'SERVING', createdAt: at(0, '08:40'), calledAt: at(0, '10:52') },
+    ...demoQueue('unit-sj', 'Rolling Botika • San Juan', 84, 19, ['Consultation', 'Screening', 'Medicine pickup'], false),
+    ...demoQueue('unit-mho', 'Municipal Health Office', 58, 12, ['Consultation', 'Medicine pickup', 'Vaccination'], true),
+    ...demoQueue('unit-sa', 'Rolling Botika • Sta. Ana', 22, 6, ['Consultation', 'Medicine pickup', 'Vaccination'], true),
   ],
   consultations: [
     { id: 'con-001', residentId: 'res-aj', residentName: 'AJ F. Alanzalon', barangay: 'San Juan', date: at(-60, '10:00'), type: 'Free Consultation', complaint: 'Blood pressure follow-up', bp: '138/88', findings: 'Elevated blood pressure', advice: 'Continue Losartan, monitor BP weekly', doctor: 'Dr. Alfredo Pascual', location: 'Rolling Botika • San Juan', unitId: 'unit-sj' },
