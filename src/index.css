@@ -1462,3 +1462,28 @@ blockquote cite { display: block; margin-top: 10px; font-style: normal; font-wei
   .ask-pop-wrap { right: 12px; left: 12px; width: auto; bottom: calc(162px + env(safe-area-inset-bottom)); }
   .ask-pop .chat-body { max-height: 34vh; }
 }
+
+/* ---------- E-Pila unit cards: same structure and section heights so cards line up ---------- */
+.unit-grid { align-items: stretch; }
+.unit-card { gap: 14px; }
+.unit-card-head { min-height: 92px; }
+.unit-card-head .grow { min-width: 0; }
+.unit-card-head h3 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.unit-card-head p { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.6em; margin: 0; }
+.now-serving { margin-top: 0; min-height: 152px; display: flex; flex-direction: column; }
+.now-serving.empty { justify-content: center; text-align: center; }
+.ns-row .grow { min-width: 0; }
+.ns-row .grow b, .ns-row .grow small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ns-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: auto; padding-top: 12px; }
+.ns-actions .btn { padding: 0 6px; gap: 5px; white-space: nowrap; min-width: 0; font-size: 14px; }
+.next-up { margin-top: 0; display: flex; flex-direction: column; }
+.next-up ol { min-height: calc(4 * 38px + 3 * 6px); margin: 6px 0 6px; }
+.next-up li { height: 38px; padding: 0 10px; }
+.next-up li .grow { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.next-up li.li-empty { height: calc(4 * 38px + 3 * 6px); justify-content: center; color: var(--ink-3, #7a8894); background: #f6f9fc; font-size: 14px; }
+.next-more { min-height: 18px; }
+.cutoff { min-height: 20px; margin: -6px 0 0; }
+.unit-actions { margin-top: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.unit-actions .btn { justify-content: center; }
+.unit-actions .mini-select { width: 100%; }
+.ns-actions .btn svg, .unit-actions .btn svg { flex-shrink: 0; }

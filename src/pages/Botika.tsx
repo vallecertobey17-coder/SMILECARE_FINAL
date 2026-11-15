@@ -154,7 +154,7 @@ export default function Botika() {
                 <div><b>~{per}m</b><small>Per person</small></div>
               </div>
 
-              {u.status !== 'CLOSED' && (
+              {(
                 <div className={`now-serving ${cur ? '' : 'empty'}`}>
                   <span className="eyebrow">Now serving</span>
                   {cur ? (
@@ -175,14 +175,15 @@ export default function Botika() {
                         </div>
                       )}
                     </>
-                  ) : <p className="muted small">Nobody is being served. Press Call next.</p>}
+                  ) : <p className="muted small">{u.status === 'CLOSED' ? 'Unit closed — no queue right now.' : 'Nobody is being served. Press Call next.'}</p>}
                 </div>
               )}
 
-              {line.length > 0 && (
+              {(
                 <div className="next-up">
                   <span className="muted small">Next up</span>
                   <ol>
+                    {!line.length && <li className="li-empty">{u.status === 'CLOSED' ? 'Queue closed' : 'No one waiting'}</li>}
                     {line.slice(0, 4).map((t) => (
                       <li key={t.id} className={t.priority ? 'is-prio' : ''}>
                         <b>#{t.number}</b>
@@ -192,10 +193,10 @@ export default function Botika() {
                       </li>
                     ))}
                   </ol>
-                  {line.length > 4 && <small className="muted">+{line.length - 4} more waiting • ~{line.length * per} min to clear</small>}
+                  <small className="muted next-more">{line.length > 4 ? `+${line.length - 4} more waiting • ~${line.length * per} min to clear` : line.length ? `~${line.length * per} min to clear` : '\u00a0'}</small>
                 </div>
               )}
-              {closedForNew && <p className="cutoff"><Clock size={15} /> New numbers closed — {CUTOFF_MIN} min before closing time.</p>}
+              <p className="cutoff">{closedForNew ? <><Clock size={15} /> New numbers closed — {CUTOFF_MIN} min before closing time.</> : '\u00a0'}</p>
 
               {!readOnly && (
                 <div className="unit-actions">
