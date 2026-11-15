@@ -57,7 +57,7 @@ const RESIDENT_NAV: NavItem[] = [
   { id: 'my-announcements', label: 'Announcements', icon: 'r-announce', short: 'News' },
   { id: 'ask-smile', label: 'Ask SMILE', icon: 'r-ask' },
 ]
-// Phone bottom menu: always these 5, in this order (History, News and Help stay in the ☰ menu)
+// Phone bottom menu: always these 5, in this order (History, News, Help and Sign out are on the Profile page)
 const RESIDENT_BOTTOM = ['my-home', 'my-schedule', 'my-booking', 'ask-smile', 'my-profile']
 const RESIDENT_ROUTES = new Set([...RESIDENT_NAV.map((n) => n.id), 'my-help'])
 const STAFF_ROUTES = new Set([...STAFF_NAV.map((n) => n.id), 'preferences'])
@@ -233,7 +233,7 @@ function ResidentApp({ session, route, go, onLogout }: { session: Session; route
   }
   const bottom = RESIDENT_BOTTOM.map((id) => RESIDENT_NAV.find((n) => n.id === id)!)
   return (
-    <ResidentContext.Provider value={{ session, resident, go, read, markRead }}>
+    <ResidentContext.Provider value={{ session, resident, go, read, markRead, onLogout }}>
       <Layout
         route={route}
         go={go}

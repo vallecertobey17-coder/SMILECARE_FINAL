@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BadgeCheck, Clock, Pencil, Save, ShieldAlert, Upload } from 'lucide-react'
+import { BadgeCheck, Bell, ChevronRight, Clock, History, LifeBuoy, LogOut, Pencil, Save, ShieldAlert, Upload } from 'lucide-react'
 import { useStore } from '../../lib/store'
 import { useResident } from './context'
 import { QR } from '../../components/QR'
@@ -9,7 +9,7 @@ import { MUNICIPALITY } from '../../config'
 
 export default function RProfile() {
   const { update } = useStore()
-  const { resident } = useResident()
+  const { resident, go, onLogout } = useResident()
   const toast = useToast()
   const [editing, setEditing] = useState(false)
   const [f, setF] = useState({ name: resident.name, birthdate: resident.birthdate ?? '', contact: resident.contact ?? '', address: resident.address ?? '', barangay: resident.barangay })
@@ -143,6 +143,13 @@ export default function RProfile() {
           )}
         </section>
       </div>
+      <section className="card more-links">
+        <div className="card-head"><h3>More</h3></div>
+        <button className="more-link" onClick={() => go('my-history')}><History size={20} /><span className="grow">Health History</span><ChevronRight size={18} /></button>
+        <button className="more-link" onClick={() => go('my-announcements')}><Bell size={20} /><span className="grow">Announcements</span><ChevronRight size={18} /></button>
+        <button className="more-link" onClick={() => go('my-help')}><LifeBuoy size={20} /><span className="grow">Need help? Contact IT Support</span><ChevronRight size={18} /></button>
+        <button className="more-link danger" onClick={onLogout}><LogOut size={20} /><span className="grow">Sign out</span></button>
+      </section>
     </div>
   )
 }

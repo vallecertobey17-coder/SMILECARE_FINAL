@@ -8,6 +8,7 @@ export interface ResidentCtx {
   go: (route: string) => void
   read: Set<string>
   markRead: (ids: string[]) => void
+  onLogout: () => void
 }
 export const ResidentContext = createContext<ResidentCtx | null>(null)
 export function useResident() {

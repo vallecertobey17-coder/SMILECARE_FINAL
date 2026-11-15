@@ -1,5 +1,4 @@
 import { isValidElement, useEffect, useRef, useState, type ReactElement, type ReactNode } from 'react'
-import { Menu, X } from 'lucide-react'
 import { Icon, BellIcon, type IconName } from './Icon'
 import { useStore } from '../lib/store'
 import { initials } from '../lib/utils'
@@ -58,7 +57,6 @@ export function Layout({
   children: ReactNode
 }) {
   const { backend, stale, error, online, pending } = useStore()
-  const [drawer, setDrawer] = useState(false)
   const [bellOpen, setBellOpen] = useState(false)
   const [help, setHelp] = useState(false)
   const bnRef = useRef<HTMLDivElement>(null)
@@ -72,7 +70,6 @@ export function Layout({
 
   const navTo = (id: string) => {
     go(id)
-    setDrawer(false)
   }
 
   const statusText = !online
@@ -99,12 +96,9 @@ export function Layout({
 
   return (
     <div className="shell">
-      <aside className={`sidebar ${drawer ? 'open' : ''}`}>
+      <aside className="sidebar">
         <div className="sidebar-top">
           <Logo />
-          <button className="icon-btn only-mobile" onClick={() => setDrawer(false)} aria-label="Close menu">
-            <X size={22} />
-          </button>
         </div>
         <nav className="nav">
           {nav.map(item)}
@@ -128,13 +122,9 @@ export function Layout({
           </button>
         </div>
       </aside>
-      {drawer && <div className="scrim" onClick={() => setDrawer(false)} />}
 
       <div className="main">
         <header className="header">
-          <button className="icon-btn only-mobile menu-btn" onClick={() => setDrawer(true)} aria-label="Open menu">
-            <Menu size={28} strokeWidth={2.4} />
-          </button>
           <span className="only-mobile header-logo">
             <Logo />
           </span>

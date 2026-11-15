@@ -1345,3 +1345,20 @@ blockquote cite { display: block; margin-top: 10px; font-style: normal; font-wei
   .deploy .deploy-btns > .btn.btn-outline { background: #fff; border: 1.3px solid #006398; color: #006398; }
   .deploy .deploy-btns > .btn.btn-primary { background: #006398; border: 1.3px solid #006398; color: #fff; }
 }
+
+/* Mobile: give requirement / recommendation text the full row instead of a 1-word column */
+@media (max-width: 640px) {
+  .req > .grow { flex: 1 1 100%; overflow-wrap: break-word; }
+  .rec { flex-wrap: wrap; align-items: flex-start; }
+  .rec > .grow { flex: 1 1 calc(100% - 48px); overflow-wrap: break-word; }
+  .rec > .btn { margin-left: 48px; }
+}
+
+/* Resident Profile → "More" links (replaces the old ☰ drawer on phones) */
+.more-links { display: flex; flex-direction: column; gap: 4px; margin-top: 16px; }
+.more-link { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 8px; background: transparent; border: 0; border-bottom: 1px solid #e3ebf2; text-align: left; font-size: 16px; font-weight: 500; color: inherit; cursor: pointer; border-radius: 8px; }
+.more-link:last-child { border-bottom: 0; }
+.more-link:hover { background: var(--brand-50); color: var(--brand); }
+.more-link svg { color: var(--brand); flex-shrink: 0; }
+.more-link.danger, .more-link.danger svg { color: var(--red-ink); }
+@media (min-width: 901px) { .more-links { display: none; } }
