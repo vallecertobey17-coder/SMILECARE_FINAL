@@ -201,7 +201,7 @@ export function Layout({
           <>
             {moreOpen && (
               <>
-                <div className="click-away" onClick={() => setMoreOpen(false)} />
+                <div className="click-away more-scrim" onClick={() => setMoreOpen(false)} />
                 <div className="more-pop" role="menu" aria-label="More pages">
                   <div className="more-grid">
                     {rest.map(({ id, label, short, icon }) => (
@@ -211,12 +211,14 @@ export function Layout({
                       </button>
                     ))}
                   </div>
-                  <div className="more-foot">
-                    <button role="menuitem" className="more-row" onClick={() => { setMoreOpen(false); if (helpRoute) navTo(helpRoute); else setHelp(true) }}>
-                      <Icon name="help" /> <span>Need help? Contact IT Support</span>
+                  <div className="more-grid more-foot">
+                    <button role="menuitem" className="more-item" onClick={() => { setMoreOpen(false); if (helpRoute) navTo(helpRoute); else setHelp(true) }}>
+                      <span className="bn-ic"><Icon name="help" /></span>
+                      <span>Need help?</span>
                     </button>
-                    <button role="menuitem" className="more-row danger" onClick={onLogout}>
-                      <Icon name="logout" /> <span>Sign out</span>
+                    <button role="menuitem" className="more-item danger" onClick={onLogout}>
+                      <span className="bn-ic"><Icon name="logout" /></span>
+                      <span>Sign out</span>
                     </button>
                   </div>
                 </div>

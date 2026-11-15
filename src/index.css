@@ -1371,8 +1371,11 @@ blockquote cite { display: block; margin-top: 10px; font-style: normal; font-wei
   .more-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px; border: 0; background: transparent; border-radius: 14px; font-size: 12px; font-weight: 500; color: var(--ink, #1d2a35); cursor: pointer; }
   .more-item .bn-ic { display: grid; place-items: center; height: 28px; }
   .more-item.active { background: var(--brand-50); color: var(--brand); }
-  .more-foot { border-top: 1px solid #e3ebf2; margin-top: 8px; padding-top: 6px; display: flex; flex-direction: column; }
-  .more-row { display: flex; align-items: center; gap: 10px; padding: 11px 8px; border: 0; background: transparent; border-radius: 10px; font-size: 15px; font-weight: 500; text-align: left; color: inherit; cursor: pointer; }
-  .more-row svg { color: var(--brand); width: 22px; height: 22px; }
-  .more-row.danger, .more-row.danger svg { color: var(--red-ink); }
+  .more-foot { border-top: 1px solid #e3ebf2; margin-top: 8px; padding-top: 8px; }
+  .more-item .bn-ic svg { width: 24px; height: 24px; }
+  .more-foot .bn-ic > span[style] { width: 24px !important; height: 20px !important; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; }
+  .more-item:active { background: var(--brand-50); }
+  .more-item.danger, .more-item.danger svg { color: var(--red-ink); }
+  .more-scrim { background: rgba(10, 25, 40, .45); animation: fade .15s; }
+  @keyframes fade { from { opacity: 0 } to { opacity: 1 } }
 }
