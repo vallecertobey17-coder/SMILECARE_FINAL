@@ -640,7 +640,9 @@ blockquote cite { display: block; margin-top: 10px; font-style: normal; font-wei
 .ann-body { color: var(--ink-3); }
 .ann-top { display: flex; align-items: center; gap: 8px; }
 .ann-top .tag { margin: 0; }
-.dot-unread { position: absolute; top: 20px; right: 20px; width: 10px; height: 10px; border-radius: 50%; background: var(--brand); }
+.ann-when { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; flex-shrink: 0; }
+.ann-when small { white-space: nowrap; }
+.dot-unread { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #006398; flex-shrink: 0; }
 
 /* chat */
 .chat { display: flex; flex-direction: column; padding: 0; overflow: hidden; }

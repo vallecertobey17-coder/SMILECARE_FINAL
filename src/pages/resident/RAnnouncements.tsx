@@ -13,13 +13,13 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'advisories', label: 'Advisories' },
 ]
 
-export function when(iso: string) {
+export function when(iso: string, month: 'long' | 'short' = 'long') {
   const d = new Date(iso)
   const days = Math.floor((new Date().setHours(0, 0, 0, 0) - new Date(d).setHours(0, 0, 0, 0)) / 86400000)
   const time = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
   if (days <= 0) return `Today, ${time}`
   if (days === 1) return 'Yesterday'
-  return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
+  return d.toLocaleDateString('en-US', { month, day: 'numeric' })
 }
 
 export const catTone = (c: Announcement['category']) => (c === 'URGENT' ? 'pill-no' : c === 'ROLLING BOTIKA' ? 'pill-blue' : c === 'APPOINTMENT' ? 'pill-ok' : 'pill-wait')
@@ -84,12 +84,14 @@ export default function RAnnouncements() {
               <span className="ann-top">
                 <span className={`pill ${catTone(a.category)}`}>{a.category}</span>
                 {a.barangay && <span className="tag">BRGY. {a.barangay.toUpperCase()}</span>}
-                <span className="grow" />
-                <small className="muted">{when(a.date)}</small>
+                <span className="ann-when">
+                  <small className="muted hide-phone">{when(a.date)}</small>
+                  <small className="muted show-phone">{when(a.date, 'short')}</small>
+                  {isUnread && <span className="dot-unread" aria-label="Unread" />}
+                </span>
               </span>
               <b>{a.title}</b>
               <span className="ann-body">{a.body}</span>
-              {isUnread && <span className="dot-unread" aria-label="Unread" />}
             </button>
           )
         })}
