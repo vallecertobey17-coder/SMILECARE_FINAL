@@ -4,6 +4,7 @@ import { useStore } from '../lib/store'
 import { initials } from '../lib/utils'
 import { Modal } from './ui'
 import { PROJECT } from '../config'
+import { Menu } from 'lucide-react'
 import { BrandLogo } from './BrandMark'
 
 export interface NavItem {
@@ -58,6 +59,7 @@ export function Layout({
 }) {
   const { backend, stale, error, online, pending } = useStore()
   const [bellOpen, setBellOpen] = useState(false)
+  const [moreOpen, setMoreOpen] = useState(false)
   const [help, setHelp] = useState(false)
   const bnRef = useRef<HTMLDivElement>(null)
   // keep the active item visible in the horizontally scrolling mobile bar
@@ -70,6 +72,7 @@ export function Layout({
 
   const navTo = (id: string) => {
     go(id)
+    setMoreOpen(false)
   }
 
   const statusText = !online
@@ -188,16 +191,56 @@ export function Layout({
         <main className="content">{children}</main>
       </div>
 
-      <nav className={`bottom-nav ${bottom.length <= 5 ? 'bn-fixed' : ''}`} aria-label="Main">
-        <div className="bn-scroll" ref={bnRef}>
-          {bottom.map(({ id, label, short, icon }) => (
-            <button key={id} className={`bn-item ${route === id ? 'active' : ''}`} onClick={() => navTo(id)} aria-current={route === id ? 'page' : undefined}>
-              <span className="bn-ic">{renderIcon(icon)}</span>
-              <span className={`bn-label ${(short ?? label).length > 8 ? 'long' : ''}`}>{short ?? label}</span>
-            </button>
-          ))}
-        </div>
-      </nav>
+      {(() => {
+        // Phone bar: at most 5 slots. With more pages, show 4 + a ☰ "More" button that pops out the rest.
+        const overflow = bottom.length > 5
+        const shown = overflow ? bottom.slice(0, 4) : bottom
+        const rest = overflow ? bottom.slice(4) : []
+        const moreActive = rest.some((r) => r.id === route)
+        return (
+          <>
+            {moreOpen && (
+              <>
+                <div className="click-away" onClick={() => setMoreOpen(false)} />
+                <div className="more-pop" role="menu" aria-label="More pages">
+                  <div className="more-grid">
+                    {rest.map(({ id, label, short, icon }) => (
+                      <button key={id} role="menuitem" className={`more-item ${route === id ? 'active' : ''}`} onClick={() => navTo(id)}>
+                        <span className="bn-ic">{renderIcon(icon)}</span>
+                        <span>{short ?? label}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="more-foot">
+                    <button role="menuitem" className="more-row" onClick={() => { setMoreOpen(false); if (helpRoute) navTo(helpRoute); else setHelp(true) }}>
+                      <Icon name="help" /> <span>Need help? Contact IT Support</span>
+                    </button>
+                    <button role="menuitem" className="more-row danger" onClick={onLogout}>
+                      <Icon name="logout" /> <span>Sign out</span>
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+            <nav className="bottom-nav bn-fixed" aria-label="Main">
+              <div className="bn-scroll" ref={bnRef}>
+                {shown.map(({ id, label, short, icon }) => (
+                  <button key={id} className={`bn-item ${route === id ? 'active' : ''}`} onClick={() => navTo(id)} aria-current={route === id ? 'page' : undefined}>
+                    <span className="bn-ic">{renderIcon(icon)}</span>
+                    <span className={`bn-label ${(short ?? label).length > 8 ? 'long' : ''}`}>{short ?? label}</span>
+                  </button>
+                ))}
+                {overflow && (
+                  <button className={`bn-item ${moreActive || moreOpen ? 'active' : ''}`} onClick={() => setMoreOpen((v) => !v)} aria-haspopup="menu" aria-expanded={moreOpen} aria-label="More pages">
+                    <span className="bn-ic"><Menu size={24} strokeWidth={1.6} /></span>
+                    <span className="bn-label">More</span>
+                  </button>
+                )}
+              </div>
+            </nav>
+          </>
+        )
+      })()}
 
       <Modal open={help} title="IT Support" subtitle={`${PROJECT.name} • Municipality of Taytay`} onClose={() => setHelp(false)}>
         <div className="stack">
