@@ -6,7 +6,7 @@ import { fmtDate, fmtTime, isoDate, medicineStatus } from '../../lib/utils'
 import { medLabel } from '../../lib/domain'
 
 type Msg = { role: 'user' | 'assistant'; content: string }
-const CHIPS = ['Rolling Botika Schedule', 'Refill my medicine', 'Book a consultation', 'What is Losartan for?']
+const CHIPS = ['Rolling Botika schedule', 'Refill my medicine', 'Book a consultation', 'What is Losartan for?']
 const EMERGENCY = /(chest pain|can't breathe|cannot breathe|difficulty breathing|unconscious|seizure|stroke|heavy bleeding|suicid|overdose|nalason|hindi makahinga)/i
 
 export default function AskSmile() {
@@ -137,29 +137,22 @@ ${context()}`
   }
 
   return (
-    <div className="page rpage">
+    <div className="page rpage ask-page">
       <div className="page-head">
         <div>
           <h1 className="rtitle">Ask SMILE</h1>
           <p>Simple health guidance, available anytime.</p>
         </div>
-        <span className="pill pill-no lg">
+        <span className="pill pill-no lg ask-warn">
           <AlertTriangle size={14} /> NOT FOR EMERGENCIES
         </span>
       </div>
-      <div className="chips">
-        {CHIPS.map((c) => (
-          <button key={c} className="chip" onClick={() => ask(c)} disabled={busy}>
-            {c}
-          </button>
-        ))}
-      </div>
-      <section className="chat card">
+      <section className="chat card ask-chat">
         <div className="chat-head">
           <span className="avatar">SC</span>
           <span>
-            <b>SMILE Health assistant</b>
-            <small className="muted">{ai ? 'Online now • AI powered' : 'Online now'}</small>
+            <b>SMILE Health Assistant</b>
+            <small className="muted online"><i className="online-dot" />{ai ? 'Online now • AI powered' : 'Online now'}</small>
           </span>
         </div>
         <div className="chat-body" aria-live="polite">
@@ -170,19 +163,29 @@ ${context()}`
           ))}
           <div ref={endRef} />
         </div>
-        <p className="chat-note">For emergencies, call 911 or go to the nearest hospital. SMILE gives general information only and does not diagnose or prescribe.</p>
+        <div className="suggest">
+          <span className="suggest-label">Suggested</span>
+          <div className="suggest-row">
+            {CHIPS.map((c) => (
+              <button key={c} type="button" className="suggest-chip" onClick={() => ask(c)} disabled={busy}>
+                {c}
+              </button>
+            ))}
+          </div>
+        </div>
         <form className="chat-input" onSubmit={submit}>
-          <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type your health question...." aria-label="Type your health question" />
+          <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type your health question…" aria-label="Type your health question" />
           {busy && ai ? (
-            <button type="button" className="btn btn-outline" onClick={() => ctl.current?.abort()}>
-              <Square size={16} /> Stop
+            <button type="button" className="send-btn stop" onClick={() => ctl.current?.abort()} aria-label="Stop">
+              <Square size={16} />
             </button>
           ) : (
-            <button className="btn btn-primary" disabled={!input.trim() || busy}>
-              <Send size={17} /> Send
+            <button className="send-btn" disabled={!input.trim() || busy} aria-label="Send">
+              <Send size={18} />
             </button>
           )}
         </form>
+        <p className="chat-note">For emergencies, call 911 or go to the nearest hospital. SMILE does not diagnose or prescribe.</p>
       </section>
     </div>
   )

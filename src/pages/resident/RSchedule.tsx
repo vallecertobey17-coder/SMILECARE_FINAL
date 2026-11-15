@@ -140,7 +140,8 @@ export default function RSchedule() {
       <div className="page-head">
         <div>
           <h1 className="rtitle">Schedule &amp; availability</h1>
-          <p>Find the Rolling Botika and municipal health services near you.</p>
+          <p className="hide-phone">Find the Rolling Botika and municipal health services near you.</p>
+          <p className="show-phone">Find the nearest Rolling Botika near you</p>
         </div>
       </div>
 
@@ -188,17 +189,26 @@ export default function RSchedule() {
         <div className="nearest">
           {nearest && me && (
             <div className="nearest-hero">
-              <Navigation size={22} />
+              <Navigation size={22} className="nh-ic" />
               <div className="grow">
                 <small>Nearest Rolling Botika</small>
                 <b>{nearest.name}</b>
-                <span>{fmtKm(nearest.km!)} away • about {mins(nearest.km!, 4.5)} min walk or {mins(nearest.km!, 18)} min by tricycle • now serving #{nearest.serving || '—'}, {nearest.queue} in queue</span>
+                <span className="hide-phone">{fmtKm(nearest.km!)} away • about {mins(nearest.km!, 4.5)} min walk or {mins(nearest.km!, 18)} min by tricycle • now serving #{nearest.serving || '—'}, {nearest.queue} in queue</span>
+                <ul className="nh-lines show-phone">
+                  <li>{fmtKm(nearest.km!)} away • {mins(nearest.km!, 4.5)} min walk • {mins(nearest.km!, 18)} min by tricycle</li>
+                  <li>Now serving #{nearest.serving || '—'} • {nearest.queue} in queue</li>
+                  <li>Open until {fmtTime(nearest.until)}</li>
+                </ul>
                 {meNote && <em>{meNote}</em>}
               </div>
-              <button className="btn btn-white sm" onClick={() => go('my-booking')}>Join E-Pila</button>
+              <button className="btn btn-white sm nh-join" onClick={() => go('my-booking')}>Join E-Pila</button>
             </div>
           )}
           {!me && <p className="muted small">Tap <b>Locate me</b> to find the Rolling Botika nearest to you. All deployed units are shown on the map.</p>}
+          <div className="unit-dist-head show-phone">
+            <b>All Rolling Botika units</b>
+            <span>{unitPins.length} units</span>
+          </div>
           <div className="unit-dist">
             {unitPins.map((u) => (
               <button key={u.id} className={`unit-row ${u.id === nearest?.id ? 'near' : ''} ${u.active ? '' : 'off'}`} onClick={() => setFocusUnit(u.id)}>
@@ -207,8 +217,10 @@ export default function RSchedule() {
                   <b>{u.name}</b>
                   <small className="muted">{u.active ? `${u.status === 'IN PROGRESS' ? 'Serving now' : 'Open'} until ${fmtTime(u.until)} • ${u.queue} in queue` : u.next ? `Next visit ${new Date(u.next + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : 'Not deployed today'}</small>
                 </span>
-                {u.km != null && <span className="dist">{fmtKm(u.km)}</span>}
-                <span className={`pill ${u.active ? 'pill-ok' : 'pill-wait'}`}>{u.active ? 'DEPLOYED' : 'SCHEDULED'}</span>
+                <span className="unit-meta">
+                  {u.km != null && <span className="dist"><Navigation size={13} className="dist-ic" />{fmtKm(u.km)}</span>}
+                  <span className={`pill ${u.active ? 'pill-ok' : 'pill-wait'}`}>{u.active ? 'DEPLOYED' : 'SCHEDULED'}</span>
+                </span>
               </button>
             ))}
           </div>
@@ -284,7 +296,7 @@ export default function RSchedule() {
               </div>
               <div className="btn-row">
                 <button className="btn btn-outline sm" onClick={() => setOpen(isOpen ? null : d.key)} aria-expanded={isOpen}>
-                  {isOpen ? 'Hide medicines' : 'Check medicine availability'}
+                  {isOpen ? 'Hide medicines' : <><span className="hide-phone">Check medicine availability</span><span className="show-phone">Check medicines</span></>}
                 </button>
                 <button className="btn btn-primary sm" onClick={() => go('my-booking')}>
                   Pre-book a slot

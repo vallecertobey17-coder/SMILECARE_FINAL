@@ -198,12 +198,12 @@ export function Layout({
         <main className="content">{children}</main>
       </div>
 
-      <nav className="bottom-nav" aria-label="Main">
+      <nav className={`bottom-nav ${bottom.length <= 5 ? 'bn-fixed' : ''}`} aria-label="Main">
         <div className="bn-scroll" ref={bnRef}>
           {bottom.map(({ id, label, short, icon }) => (
             <button key={id} className={`bn-item ${route === id ? 'active' : ''}`} onClick={() => navTo(id)} aria-current={route === id ? 'page' : undefined}>
               <span className="bn-ic">{renderIcon(icon)}</span>
-              <span>{short ?? label}</span>
+              <span className={`bn-label ${(short ?? label).length > 8 ? 'long' : ''}`}>{short ?? label}</span>
             </button>
           ))}
         </div>
