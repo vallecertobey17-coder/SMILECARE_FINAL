@@ -1323,3 +1323,25 @@ blockquote cite { display: block; margin-top: 10px; font-style: normal; font-wei
   .send-btn { width: 44px; height: 44px; }
   .ask-chat .chat-note { padding: 0 14px 10px; font-size: 11px; }
 }
+
+/* ===== Upcoming schedules cards on phones ===== */
+@media (max-width: 640px) {
+  .rpage .sec-title { font-size: 20px; font-weight: 800; color: #101c26; margin-top: 6px; }
+  .deploy { gap: 14px; padding: 16px; }
+  .deploy-head { align-items: flex-start; gap: 14px; }
+  .deploy-head .date-tile.sm { width: 56px; height: 62px; border-radius: 12px; background: #d6ecfb; }
+  .deploy-head .date-tile.sm b { font-size: 24px; font-weight: 800; }
+  .deploy-head .date-tile.sm small { font-size: 11px; font-weight: 700; margin-top: 3px; }
+  .deploy-head .grow { min-width: 0; overflow-wrap: break-word; }
+  .deploy-title { font-size: 15px; font-weight: 700; line-height: 1.3; margin-bottom: 3px; }
+  .deploy-line.show-phone { display: block !important; }
+  .deploy-line { font-size: 12.5px; color: #5f6f7d; line-height: 1.4; }
+  .svc-chips { align-items: center; }
+  .svc-chip { font-size: 13px; padding: 7px 11px; }
+  .svc-chip small { white-space: nowrap; }
+  .today-pill { display: inline-flex !important; margin-left: auto; }
+  .deploy-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex-wrap: nowrap; }
+  .deploy-btns > .btn { width: 100%; min-width: 0; height: 44px; padding: 0 8px; border-radius: 12px; font-size: 13.5px; font-weight: 700; justify-content: center; text-align: center; white-space: nowrap; }
+  .deploy .deploy-btns > .btn.btn-outline { background: #fff; border: 1.3px solid #006398; color: #006398; }
+  .deploy .deploy-btns > .btn.btn-primary { background: #006398; border: 1.3px solid #006398; color: #fff; }
+}

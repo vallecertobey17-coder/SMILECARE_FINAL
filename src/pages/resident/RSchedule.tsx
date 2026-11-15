@@ -278,11 +278,13 @@ export default function RSchedule() {
                 </span>
                 <div className="grow">
                   <b className="deploy-title">{d.unitId ? 'Rolling Botika' : 'Health service'} • Brgy. {d.barangay || d.location}</b>
-                  <small className="muted">
+                  <small className="muted hide-phone">
                     {dt.toLocaleDateString('en-US', { weekday: 'long' })} • {fmtTime(start)} - {fmtTime(end)} • {d.location}
                   </small>
+                  <small className="deploy-line show-phone">{dt.toLocaleDateString('en-US', { weekday: 'long' })} • {fmtTime(start)} – {fmtTime(end)}</small>
+                  <small className="deploy-line show-phone">{d.location}</small>
                 </div>
-                {d.date === today && <span className="pill pill-ok">TODAY</span>}
+                {d.date === today && <span className="pill pill-ok hide-phone">TODAY</span>}
               </div>
               <div className="svc-chips">
                 {d.services.map((s) => {
@@ -293,8 +295,9 @@ export default function RSchedule() {
                     </span>
                   )
                 })}
+                {d.date === today && <span className="pill pill-ok today-pill show-phone">TODAY</span>}
               </div>
-              <div className="btn-row">
+              <div className="btn-row deploy-btns">
                 <button className="btn btn-outline sm" onClick={() => setOpen(isOpen ? null : d.key)} aria-expanded={isOpen}>
                   {isOpen ? 'Hide medicines' : <><span className="hide-phone">Check medicine availability</span><span className="show-phone">Check medicines</span></>}
                 </button>
