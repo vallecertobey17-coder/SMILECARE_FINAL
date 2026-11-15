@@ -65,6 +65,32 @@ export async function createAccount(a: { kind: AccountKind; name: string; email:
   return acc
 }
 
+/* ---------- self-service password reset ----------
+   A 6-digit code is issued for the account's email and expires after 10 minutes.
+   (No email service is connected in demo mode, so the UI shows the code on screen.) */
+const RST = 'smilecare:reset'
+export function issueResetCode(email: string): string | null {
+  const acc = findAccount(email)
+  if (!acc) return null
+  const code = String(Math.floor(100000 + Math.random() * 900000))
+  write(ss(), RST, { email: acc.email, code, exp: Date.now() + 10 * 60 * 1000 })
+  return code
+}
+export async function resetPassword(email: string, code: string, password: string) {
+  const r = read<{ email: string; code: string; exp: number }>(ss(), RST)
+  if (!r || r.email !== normEmail(email)) throw new Error('Request a new code for this email first.')
+  if (Date.now() > r.exp) throw new Error('This code has expired. Please request a new one.')
+  if (r.code !== code.trim()) throw new Error('That code is incorrect. Check the code and try again.')
+  if (password.length < 8) throw new Error('Use at least 8 characters for your new password.')
+  const list = accounts()
+  const i = list.findIndex((a) => a.email === r.email)
+  if (i < 0) throw new Error('Account not found.')
+  const salt = Math.random().toString(36).slice(2)
+  list[i] = { ...list[i], salt, hash: await hash(password, salt) }
+  write(ls(), ACC, list)
+  write(ss(), RST, null)
+}
+
 export async function checkPassword(email: string, password: string): Promise<Account> {
   const acc = findAccount(email)
   if (!acc || (await hash(password, acc.salt)) !== acc.hash) throw new Error('Incorrect email or password.')

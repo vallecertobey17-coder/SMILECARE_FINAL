@@ -1398,3 +1398,4 @@ blockquote cite { display: block; margin-top: 10px; font-style: normal; font-wei
 @media (max-width: 640px) { .splash-wm { font-size: 36px } .splash-mark svg { width: 64px; height: 64px } .splash-tag { font-size: 13px; text-align: center; padding: 0 24px } }
 .ficon.ic-sm { transform: scale(.82); }
 @media (prefers-reduced-motion: reduce) { .splash-mark, .splash-wm, .splash-tag, .splash-bar, .splash-bar span { animation-duration: .01s !important; animation-iteration-count: 1 !important; } }
+.reset-code { font-size: 20px; letter-spacing: .2em; margin-left: 6px; }

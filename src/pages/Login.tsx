@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { ArrowLeft, Eye, EyeOff, ShieldCheck, Upload, UserRound, Stethoscope } from 'lucide-react'
-import { checkPassword, createAccount, findAccount, normEmail, saveSession, type AccountKind, type Session } from '../lib/auth'
+import { checkPassword, createAccount, findAccount, issueResetCode, normEmail, resetPassword, saveSession, type AccountKind, type Session } from '../lib/auth'
 import { useStore } from '../lib/store'
 import { Logo } from '../components/Layout'
 import { BARANGAYS, isoDate } from '../lib/utils'
@@ -52,10 +52,46 @@ export default function Login({ onLogin, onBack, initialKind = 'resident' }: { o
   const [show, setShow] = useState(false)
   const [agree, setAgree] = useState(false)
   const [err, setErr] = useState('')
+  const [notice, setNotice] = useState('')
   const [busy, setBusy] = useState(false)
   const set = (k: keyof typeof f, v: string) => setF((p) => ({ ...p, [k]: v }))
 
+  const [resetStep, setResetStep] = useState<'email' | 'code'>('email')
+  const [resetCode, setResetCode] = useState('')
+  const [demoCode, setDemoCode] = useState('')
+  async function forgotSubmit(e: FormEvent) {
+    e.preventDefault()
+    setErr('')
+    try {
+      if (resetStep === 'email') {
+        if (!/^\S+@\S+\.\S+$/.test(f.email.trim())) return setErr('Enter a valid email address.')
+        const d = DEMOS.find((x) => x.email === normEmail(f.email))
+        if (d && !findAccount(d.email)) {
+          const resident = d.kind === 'resident' ? data.residents.find((r) => normEmail(r.email ?? '') === d.email) : undefined
+          await createAccount({ kind: d.kind, name: d.name, email: d.email, password: DEMO_PASSWORD, residentId: resident?.id })
+        }
+        const code = issueResetCode(f.email)
+        if (!code) return setErr('No SMILECare account uses this email. Check the spelling or create an account.')
+        setDemoCode(code)
+        setResetCode('')
+        set('password', '')
+        set('confirm', '')
+        setResetStep('code')
+      } else {
+        if (f.password !== f.confirm) return setErr('The two passwords do not match.')
+        await resetPassword(f.email, resetCode, f.password)
+        setResetStep('email')
+        setDemoCode('')
+        switchTo('login')
+        setNotice('Your password has been reset. Sign in with your new password.')
+      }
+    } catch (ex: any) {
+      setErr(ex.message)
+    }
+  }
+
   const switchTo = (m: Mode) => {
+    setResetStep('email')
     setMode(m)
     setErr('')
     set('password', '')
@@ -150,7 +186,7 @@ export default function Login({ onLogin, onBack, initialKind = 'resident' }: { o
       const resident = d.kind === 'resident' ? data.residents.find((r) => normEmail(r.email ?? '') === d.email) : undefined
       if (d.kind === 'resident' && !resident) throw new Error('The demo resident record is missing from the database.')
       if (!findAccount(d.email)) await createAccount({ kind: d.kind, name: d.name, email: d.email, password: DEMO_PASSWORD, residentId: resident?.id })
-      const acc = await checkPassword(d.email, DEMO_PASSWORD)
+      const acc = await checkPassword(d.email, DEMO_PASSWORD).catch(async () => { const c = issueResetCode(d.email); if (c) await resetPassword(d.email, c, DEMO_PASSWORD); return checkPassword(d.email, DEMO_PASSWORD) })
       done(await finish(acc.email, acc.kind, acc.name, acc.residentId ?? resident?.id))
     } catch (ex: any) {
       setErr(ex.message)
@@ -166,7 +202,7 @@ export default function Login({ onLogin, onBack, initialKind = 'resident' }: { o
         ? isRes
           ? `Register and verify that you're a resident of ${MUNICIPALITY} to access SMILECare services.`
           : 'Your email must be on the staff roster. Your role is assigned by the Administrator.'
-        : 'Password resets are handled by the SMILECare IT support team.'
+        : resetStep === 'code' ? `Enter the 6-digit code sent to ${f.email} and choose a new password.` : 'Enter your account email and we will send you a code to reset your password.'
 
   return (
     <div className="auth-page">
@@ -199,15 +235,41 @@ export default function Login({ onLogin, onBack, initialKind = 'resident' }: { o
           <p className="muted">{sub}</p>
 
           {mode === 'forgot' ? (
-            <div className="stack">
-              <div className="alert alert-ok">
-                For your security, passwords can't be reset from this screen. Contact IT Support at {PROJECT.supportEmail} or {PROJECT.supportPhone}, or visit the
-                Municipal Health Office with a valid ID.
-              </div>
-              <button className="btn btn-primary btn-block" onClick={() => switchTo('login')}>
+            <form className="stack" onSubmit={forgotSubmit} noValidate>
+              {resetStep === 'email' ? (
+                <label className="input-field">
+                  <span>Email address</span>
+                  <input type="email" value={f.email} onChange={(e) => set('email', e.target.value)} placeholder="you@example.com" autoComplete="email" />
+                </label>
+              ) : (
+                <>
+                  {demoCode && (
+                    <div className="alert alert-ok" role="status">
+                      Demo mode: no email service is connected, so your code is shown here: <b className="reset-code">{demoCode}</b>
+                    </div>
+                  )}
+                  <label className="input-field">
+                    <span>6-digit code</span>
+                    <input inputMode="numeric" maxLength={6} value={resetCode} onChange={(e) => setResetCode(e.target.value.replace(/\D/g, ''))} placeholder="000000" autoComplete="one-time-code" />
+                  </label>
+                  <label className="input-field">
+                    <span>New password</span>
+                    <input type="password" value={f.password} onChange={(e) => set('password', e.target.value)} placeholder="At least 8 characters" autoComplete="new-password" />
+                  </label>
+                  <label className="input-field">
+                    <span>Confirm new password</span>
+                    <input type="password" value={f.confirm} onChange={(e) => set('confirm', e.target.value)} placeholder="Re-enter your new password" autoComplete="new-password" />
+                  </label>
+                </>
+              )}
+              {err && <div className="alert alert-err" role="alert">{err}</div>}
+              <button className="btn btn-primary btn-block" type="submit">{resetStep === 'email' ? 'Send reset code' : 'Reset password'}</button>
+              {resetStep === 'code' && <button type="button" className="link" onClick={() => { setResetStep('email'); setErr('') }}>Use a different email or resend the code</button>}
+              <button type="button" className="btn btn-ghost btn-block" onClick={() => switchTo('login')}>
                 Back to sign in
               </button>
-            </div>
+              <p className="muted small">Can't access your email? Contact IT Support at {PROJECT.supportEmail} or {PROJECT.supportPhone}.</p>
+            </form>
           ) : (
             <form onSubmit={submit} noValidate>
               {mode === 'register' && (
@@ -293,6 +355,7 @@ export default function Login({ onLogin, onBack, initialKind = 'resident' }: { o
                   </button>
                 </div>
               )}
+              {notice && mode === 'login' && <div className="alert alert-ok" role="status">{notice}</div>}
               {err && <div className="alert alert-err">{err}</div>}
               <button className="btn btn-primary btn-block" disabled={busy}>
                 <ShieldCheck size={18} />

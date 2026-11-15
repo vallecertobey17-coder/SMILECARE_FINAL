@@ -8,7 +8,7 @@ import { PROJECT } from '../../config'
 const FIXES = [
   { q: "I can't book or join E-Pila", a: 'These unlock once your residency is verified. Check your status under Profile & QR ID.' },
   { q: 'The app says "Offline"', a: 'Your changes are kept on this device and sync automatically when your connection returns.' },
-  { q: 'I forgot my password', a: 'Contact IT support below or visit the Municipal Health Office with a valid ID.' },
+  { q: 'I forgot my password', a: 'On the sign-in page, tap "Forgot Password?", enter your email, then enter the 6-digit code and choose a new password. If you can no longer access your email, contact IT support below or visit the Municipal Health Office with a valid ID.' },
   { q: 'My Health ID QR will not scan', a: 'Turn up your screen brightness, or show your Health ID number to the staff.' },
 ]
 
