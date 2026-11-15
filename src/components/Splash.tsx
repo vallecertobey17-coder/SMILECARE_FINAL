@@ -2,17 +2,11 @@ import { useEffect, useState } from 'react'
 import { BrandMark } from './BrandMark'
 
 /** Starting animation: the SMILECare mark pops in, the wordmark slides in beside it, then it fades into the app.
- *  Plays once per browser session and is skipped for people who prefer reduced motion. */
+ *  Plays every time the site is opened or reloaded, on any page (tap to skip). */
 export function Splash() {
-  const [phase, setPhase] = useState<'show' | 'out' | 'done'>(() => {
-    try {
-      if (sessionStorage.getItem('sc-splash') || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return 'done'
-    } catch { /* ignore */ }
-    return 'show'
-  })
+  const [phase, setPhase] = useState<'show' | 'out' | 'done'>('show')
   useEffect(() => {
     if (phase === 'done') return
-    try { sessionStorage.setItem('sc-splash', '1') } catch { /* ignore */ }
     const a = setTimeout(() => setPhase('out'), 1500)
     const b = setTimeout(() => setPhase('done'), 2000)
     return () => { clearTimeout(a); clearTimeout(b) }

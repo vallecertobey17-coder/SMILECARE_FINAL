@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { AlertTriangle, UserCheck, ClipboardPlus, Syringe, UserCog, CalendarClock, Megaphone, Ticket as TicketIcon, LifeBuoy } from 'lucide-react'
+import { Icon } from './components/Icon'
 import { DataProvider, useStore } from './lib/store'
 import { ToastProvider } from './components/ui'
 import { Layout, type NavItem, type Notice } from './components/Layout'
@@ -41,7 +42,7 @@ const STAFF_NAV: (NavItem & { perm: Permission })[] = [
   { id: 'consultations', label: 'Consultations', icon: <ClipboardPlus size={24} strokeWidth={1.5} />, short: 'Consults', perm: 'consultations' },
   { id: 'vaccinations', label: 'Vaccinations', icon: <Syringe size={24} strokeWidth={1.5} />, short: 'Vaccines', perm: 'vaccinations' },
   { id: 'botika', label: 'Rolling Botika & E-Pila', icon: 'botika', short: 'Botika', perm: 'botika' },
-  { id: 'announcements', label: 'Announcements', icon: 'r-announce', short: 'News', perm: 'announcements' },
+  { id: 'announcements', label: 'Announcements', icon: <Icon name="r-announce" className="ic-sm" />, short: 'News', perm: 'announcements' },
   { id: 'analytics', label: 'Analytics & Reports', icon: 'analytics', short: 'Reports', perm: 'analytics' },
   { id: 'staff', label: 'Staff & Roles', icon: <UserCog size={24} strokeWidth={1.5} />, short: 'Staff', perm: 'staff' },
 ]

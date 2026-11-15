@@ -1396,3 +1396,5 @@ blockquote cite { display: block; margin-top: 10px; font-style: normal; font-wei
 @keyframes splash-fade { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: none } }
 @keyframes splash-load { 0% { transform: translateX(-100%) } 100% { transform: translateX(250%) } }
 @media (max-width: 640px) { .splash-wm { font-size: 36px } .splash-mark svg { width: 64px; height: 64px } .splash-tag { font-size: 13px; text-align: center; padding: 0 24px } }
+.ficon.ic-sm { transform: scale(.82); }
+@media (prefers-reduced-motion: reduce) { .splash-mark, .splash-wm, .splash-tag, .splash-bar, .splash-bar span { animation-duration: .01s !important; animation-iteration-count: 1 !important; } }
