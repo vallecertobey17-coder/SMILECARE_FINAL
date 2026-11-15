@@ -15,7 +15,7 @@ function serviceStyle(name: string): { color: string; color2: string; icon: Luci
 }
 import { useStore } from '../lib/store'
 import { AppointmentsBoard } from '../components/AppointmentsBoard'
-import { can, type Permission, type Session } from '../lib/auth'
+import { can, canAct, type Action, type Permission, type Session } from '../lib/auth'
 import { StatCard } from '../components/ui'
 import { Icon } from '../components/Icon'
 import { daysToExpiry, fmtNum, fmtTime, greeting, isoDate, medicineStatus } from '../lib/utils'
@@ -68,15 +68,16 @@ export default function Dashboard({ go: rawGo, session }: { go: (r: string) => v
       <div className="quick-row">
         {[
           { id: 'dispensing', label: 'Dispense medicine' },
-          { id: 'consultations', label: 'Record consultation' },
-          { id: 'vaccinations', label: 'Record vaccination' },
-          { id: 'residents', label: 'Register walk-in' },
+          { id: 'consultations', label: 'Record consultation', act: 'record-consultation' as Action },
+          { id: 'vaccinations', label: 'Record vaccination', act: 'record-vaccination' as Action },
+          { id: 'residents', label: 'Register walk-in', act: 'register-walkin' as Action },
           { id: 'botika', label: 'Manage E-Pila' },
-          { id: 'announcements', label: 'Post announcement' },
-          { id: 'inventory', label: 'Load Rolling Botika' },
+          { id: 'announcements', label: 'Post announcement', act: 'post-announcement' as Action },
+          { id: 'inventory', label: 'Load Rolling Botika', act: 'manage-inventory' as Action },
           { id: 'analytics', label: 'Deployment planner' },
-        ].filter((a) => allowed(a.id)).slice(0, 5).map((a) => (
-          <button key={a.id} className="chip" onClick={() => go(a.id)}>{a.label}</button>
+          { id: 'consultations', label: 'View health records', view: true },
+        ].filter((a) => allowed(a.id) && (!a.act || canAct(session, a.act)) && (!a.view || !canAct(session, 'record-consultation'))).slice(0, 5).map((a) => (
+          <button key={a.label} className="chip" onClick={() => go(a.id)}>{a.label}</button>
         ))}
       </div>
 

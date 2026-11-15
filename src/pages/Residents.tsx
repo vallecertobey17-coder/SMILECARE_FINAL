@@ -2,7 +2,7 @@ import { useMemo, useState, type FormEvent } from 'react'
 import { Users, Clock, UserX, ScanLine, UserPlus, FileImage } from 'lucide-react'
 import { useStore } from '../lib/store'
 import type { Resident, ResidentStatus } from '../lib/types'
-import type { Session } from '../lib/auth'
+import { canAct, type Session } from '../lib/auth'
 import { Icon } from '../components/Icon'
 import { QR } from '../components/QR'
 import { Badge, RowMenu, Confirm, Empty, Field, Modal, PageHead, Pager, StatCard, Toolbar, usePaged, useToast } from '../components/ui'
@@ -30,6 +30,9 @@ export default function Residents({ session }: { session: Session }) {
   const [scan, setScan] = useState('')
   const [err, setErr] = useState('')
   const isAdmin = session.role === 'Administrator'
+  // DFD 1.0: resident verification data comes from the Municipal Health Office Staff (Administrator)
+  const canVerify = !readOnly && canAct(session, 'verify-resident')
+  const canRegister = !readOnly && canAct(session, 'register-walkin')
 
   const month = isoDate().slice(0, 7)
   const pending = data.residents.filter((r) => r.status === 'PENDING')
@@ -129,7 +132,7 @@ export default function Residents({ session }: { session: Session }) {
         onToggleFilters={() => setShowFilters((v) => !v)}
         filterCount={[brgy, origin].filter(Boolean).length}
         action={
-          !readOnly && (
+          canRegister && (
             <button className="btn btn-primary" onClick={() => { setErr(''); setEditing({ draft: { ...blank(), healthId: nextHealthId() } }) }}>
               <UserPlus size={18} /> Register walk-in
             </button>
@@ -187,8 +190,8 @@ export default function Residents({ session }: { session: Session }) {
                   <td className="right" onClick={(e) => e.stopPropagation()}>
                     <RowMenu label={`Actions for ${r.name}`} items={[
                       { label: 'View profile & QR', onClick: () => openView(r) },
-                      { label: 'Verify (approve)', onClick: () => setResidentStatus(r, 'APPROVED'), hidden: readOnly || r.status === 'APPROVED' },
-                      { label: 'Reject', onClick: () => { setRemarks(''); setRejecting(r) }, hidden: readOnly || r.status === 'REJECTED' },
+                      { label: 'Verify (approve)', onClick: () => setResidentStatus(r, 'APPROVED'), hidden: !canVerify || r.status === 'APPROVED' },
+                      { label: 'Reject', onClick: () => { setRemarks(''); setRejecting(r) }, hidden: !canVerify || r.status === 'REJECTED' },
                       { label: 'Edit', onClick: () => { setErr(''); setEditing({ id: r.id, draft: { ...blank(), ...r } }) }, hidden: readOnly },
                       { label: 'Delete', onClick: () => setDeleting(r), danger: true, hidden: readOnly || !isAdmin },
                     ]} />
@@ -238,7 +241,7 @@ export default function Residents({ session }: { session: Session }) {
       </Modal>
 
       <Modal open={!!view} wide title={view?.name || ''} subtitle={view ? `${view.healthId} • Brgy. ${view.barangay}` : ''} onClose={() => setViewing(null)}
-        footer={view && !readOnly && view.status !== 'APPROVED' && (
+        footer={view && canVerify && view.status !== 'APPROVED' && (
           <>
             {view.status !== 'REJECTED' && <button className="btn btn-danger" onClick={() => { setRemarks(''); setRejecting(view) }}>Reject</button>}
             <button className="btn btn-primary" onClick={() => setResidentStatus(view, 'APPROVED')}>Verify resident</button>

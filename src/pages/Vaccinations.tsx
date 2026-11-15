@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Syringe, CalendarClock, Users } from 'lucide-react'
 import { useStore } from '../lib/store'
 import type { Vaccination } from '../lib/types'
-import type { Session } from '../lib/auth'
+import { canAct, type Session } from '../lib/auth'
 import { Icon } from '../components/Icon'
 import { RowMenu, Confirm, Empty, Field, Modal, PageHead, Pager, StatCard, Toolbar, usePaged, useToast } from '../components/ui'
 import { fmtDate, isoDate } from '../lib/utils'
@@ -12,7 +12,9 @@ const DOSES = ['1st dose', '2nd dose', '3rd dose', 'Booster', 'Annual dose']
 type Draft = Omit<Vaccination, 'id'>
 
 export default function Vaccinations({ session }: { session: Session }) {
-  const { data, add, update, remove, readOnly } = useStore()
+  const { data, add, update, remove, readOnly: storeRO } = useStore()
+  // DFD 4.0: vaccinations are health-service updates recorded by the Doctor; others view only
+  const readOnly = storeRO || !canAct(session, 'record-vaccination')
   const toast = useToast()
   const [q, setQ] = useState('')
   const [vaccine, setVaccine] = useState('')
@@ -57,7 +59,7 @@ export default function Vaccinations({ session }: { session: Session }) {
 
   return (
     <div className="page">
-      <PageHead title="Vaccinations" subtitle="Record vaccination services and keep each resident's vaccination history." />
+      <PageHead title="Vaccinations" subtitle={readOnly && !storeRO ? "View each resident's vaccination history. Only the Municipal Health Doctor can record or change vaccinations." : "Record vaccination services and keep each resident's vaccination history."} />
       <div className="stats stats-3">
         <StatCard icon={<Syringe size={24} />} label="Vaccinations this month" value={data.vaccinations.filter((v) => v.date.startsWith(month)).length} note={`${data.vaccinations.length} on record`} />
         <StatCard icon={<Users size={24} />} label="Residents vaccinated" value={new Set(data.vaccinations.map((v) => v.residentId ?? v.residentName)).size} note="Unique residents" />

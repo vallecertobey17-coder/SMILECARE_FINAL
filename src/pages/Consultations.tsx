@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Stethoscope, Droplet, HeartPulse } from 'lucide-react'
 import { useStore } from '../lib/store'
 import type { Consultation } from '../lib/types'
-import type { Session } from '../lib/auth'
+import { canAct, type Session } from '../lib/auth'
 import { Icon } from '../components/Icon'
 import { RowMenu, Confirm, Empty, Field, Modal, PageHead, Pager, StatCard, Toolbar, usePaged, useToast } from '../components/ui'
 import { fmtDate, isoDate } from '../lib/utils'
@@ -17,7 +17,9 @@ export const bpHigh = (bp?: string) => {
 export const sugarHigh = (v?: number) => (v ?? 0) >= 126
 
 export default function Consultations({ session }: { session: Session }) {
-  const { data, add, update, remove, readOnly } = useStore()
+  const { data, add, update, remove, readOnly: storeRO } = useStore()
+  // DFD 4.0: consultations are recorded by the attending Doctor / Rolling Botika Staff; others view only
+  const readOnly = storeRO || !canAct(session, 'record-consultation')
   const toast = useToast()
   const [q, setQ] = useState('')
   const [type, setType] = useState('')
@@ -64,7 +66,7 @@ export default function Consultations({ session }: { session: Session }) {
 
   return (
     <div className="page">
-      <PageHead title="Consultations" subtitle="Record and manage consultations and screenings conducted during Rolling Botika deployments." />
+      <PageHead title="Consultations" subtitle={readOnly && !storeRO ? "View consultation and screening records. Only the attending doctor or Rolling Botika staff can record or change them." : "Record and manage consultations and screenings conducted during Rolling Botika deployments."} />
       <div className="stats stats-3">
         <StatCard icon={<Stethoscope size={24} />} label="Consultations today" value={data.consultations.filter((c) => c.date.startsWith(today)).length} note={`${data.consultations.length} on record`} />
         <StatCard icon={<HeartPulse size={24} />} label="High blood pressure" value={data.consultations.filter((c) => bpHigh(c.bp)).length} note="Readings ≥ 140/90" />

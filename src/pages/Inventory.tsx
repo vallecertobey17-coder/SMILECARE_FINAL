@@ -5,7 +5,7 @@ import { useStore } from '../lib/store'
 import type { Medicine, MedicineStatus } from '../lib/types'
 import { UnitStock } from '../components/UnitStock'
 import { SupplyOrders } from '../components/SupplyOrders'
-import type { Session } from '../lib/auth'
+import { canAct, type Session } from '../lib/auth'
 import { Badge, RowMenu, Confirm, Empty, Field, Modal, PageHead, Pager, StatCard, Toolbar, usePaged, useToast } from '../components/ui'
 import { fmtMonth, fmtNum, medicineStatus } from '../lib/utils'
 
@@ -18,7 +18,8 @@ export default function Inventory({ session }: { session: Session }) {
   const store = useStore()
   const { data, add, update, remove } = store
   // Doctors receive medicine inventory information (view only) and send supply requirements.
-  const readOnly = store.readOnly || session.role === 'Municipal Health Doctor'
+  // DFD 6.0: the Doctor only receives inventory information and submits requirements
+  const readOnly = store.readOnly || !canAct(session, 'manage-inventory')
   const toast = useToast()
   const [q, setQ] = useState('')
   const [status, setStatus] = useState('')
