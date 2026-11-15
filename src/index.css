@@ -1379,3 +1379,20 @@ blockquote cite { display: block; margin-top: 10px; font-style: normal; font-wei
   .more-scrim { background: rgba(10, 25, 40, .45); animation: fade .15s; }
   @keyframes fade { from { opacity: 0 } to { opacity: 1 } }
 }
+
+/* ---------- Starting animation (splash) ---------- */
+.splash { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; background: radial-gradient(circle at 50% 40%, #ffffff 0%, #eaf4fc 55%, #d6e9f8 100%); transition: opacity .5s ease, visibility .5s; cursor: default; }
+.splash.out { opacity: 0; visibility: hidden; }
+.splash-inner { display: flex; align-items: center; gap: 18px; }
+.splash-mark { display: inline-grid; animation: splash-pop .75s cubic-bezier(.2, 1.4, .4, 1) both; }
+.splash-wm { font-size: 46px; font-weight: 800; letter-spacing: -.02em; line-height: 1; overflow: hidden; animation: splash-wm .6s .35s cubic-bezier(.2, .8, .2, 1) both; }
+.splash-wm b { color: #0b2f47; font-weight: 800; }
+.splash-wm i { font-style: normal; color: #137fb9; font-weight: 700; }
+.splash-tag { margin: 0; color: #4a6276; font-size: 15px; animation: splash-fade .5s .7s ease both; }
+.splash-bar { width: 140px; height: 4px; border-radius: 4px; background: rgba(0, 99, 152, .15); overflow: hidden; animation: splash-fade .3s .6s both; }
+.splash-bar span { display: block; height: 100%; width: 40%; border-radius: 4px; background: var(--brand-grad, #006398); animation: splash-load 1s .6s ease-in-out infinite; }
+@keyframes splash-pop { 0% { transform: scale(.3) rotate(-40deg); opacity: 0 } 60% { opacity: 1 } 100% { transform: none; opacity: 1 } }
+@keyframes splash-wm { from { opacity: 0; transform: translateX(-24px); clip-path: inset(0 100% 0 0) } to { opacity: 1; transform: none; clip-path: inset(0 0 0 0) } }
+@keyframes splash-fade { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: none } }
+@keyframes splash-load { 0% { transform: translateX(-100%) } 100% { transform: translateX(250%) } }
+@media (max-width: 640px) { .splash-wm { font-size: 36px } .splash-mark svg { width: 64px; height: 64px } .splash-tag { font-size: 13px; text-align: center; padding: 0 24px } }

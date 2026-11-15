@@ -64,11 +64,14 @@ const STAFF_ROUTES = new Set([...STAFF_NAV.map((n) => n.id), 'preferences'])
 
 const readHash = () => window.location.hash.replace(/^#/, '')
 
+import { Splash } from './components/Splash'
+
 export default function App() {
   return (
     <ToastProvider>
       <DataProvider>
         <Router />
+        <Splash />
       </DataProvider>
     </ToastProvider>
   )
